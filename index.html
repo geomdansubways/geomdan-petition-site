@@ -1,0 +1,1566 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>검단구청역을 중심으로 3개 철도가 연결되어야 합니다</title>
+  <style>
+    :root {
+      --bg: #eef3f1;
+      --surface: #ffffff;
+      --surface-2: #f7faf8;
+      --line: #c7d5cf;
+      --line-strong: #8fb1a4;
+      --text: #17312d;
+      --muted: #5f7770;
+      --primary: #184841;
+      --primary-2: #245e55;
+      --gold: #e4c989;
+      --gold-bg: #fff8ea;
+      --gold-line: #d6ba78;
+      --shadow: 0 12px 30px rgba(23, 49, 45, 0.08);
+    }
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Noto Sans KR", "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+    }
+    .hero {
+      position: relative;
+      overflow: hidden;
+      background: linear-gradient(135deg, #0f2d29 0%, #184841 38%, #245e55 68%, #0f2d29 100%);
+      background-size: 200% 200%;
+      animation: gradientFlow 7s ease infinite;
+      border-bottom: 3px solid #2c6c62;
+      padding: 48px 18px 34px;
+      text-align: center;
+    }
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 0%, rgba(228, 201, 137, 0.18), transparent 55%);
+      pointer-events: none;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -120%;
+      width: 58%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(228, 201, 137, 0.13), transparent);
+      animation: sweep 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+    @keyframes gradientFlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    @keyframes sweep {
+      0% { left: -120%; }
+      60% { left: 140%; }
+      100% { left: 140%; }
+    }
+    .chip {
+      display: inline-block;
+      padding: 6px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--gold);
+      background: rgba(228, 201, 137, 0.12);
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .4px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 14px rgba(228, 201, 137, 0.18);
+    }
+    h1 {
+      margin: 0 0 12px;
+      color: #fff;
+      font-size: clamp(24px, 4vw, 34px);
+      line-height: 1.34;
+      font-weight: 900;
+    }
+    .hero p {
+      max-width: 820px;
+      margin: 0 auto;
+      color: rgba(255,255,255,.86);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .top-tracker {
+      background: #082520;
+      color: #f4f6f5;
+      border-bottom: 2px solid rgba(126, 186, 177, .42);
+      box-shadow: 0 8px 22px rgba(0,0,0,.16);
+    }
+    .top-tracker-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 10px 18px 9px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 54px;
+      gap: 18px;
+      align-items: center;
+    }
+    .tracker-col {
+      min-width: 0;
+    }
+    .tracker-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #b7c8c1;
+      margin-bottom: 7px;
+      text-align: center;
+      letter-spacing: -.2px;
+    }
+    .tracker-list,
+    .tracker-clicks {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 6px 14px;
+      font-size: 14px;
+      font-weight: 800;
+      line-height: 1.45;
+      letter-spacing: -.15px;
+    }
+    .tracker-item,
+    .tracker-click-item {
+      color: #f5f6f4;
+      white-space: nowrap;
+    }
+    .tracker-item .count,
+    .tracker-click-item .count {
+      color: #efe9d4;
+    }
+    .tracker-divider {
+      color: rgba(255,255,255,.58);
+      font-weight: 700;
+    }
+    .tracker-icon-box {
+      width: 44px;
+      height: 38px;
+      border-radius: 10px;
+      background: rgba(255,255,255,.07);
+      border: 1px solid rgba(255,255,255,.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 17px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+    .hero {
+      padding: 60px 18px 44px;
+      background: linear-gradient(135deg, #2c5f56 0%, #2f655c 32%, #28594f 66%, #184841 100%);
+    }
+    .chip {
+      padding: 11px 26px;
+      border-width: 2px;
+      border-color: rgba(230, 204, 143, .88);
+      background: rgba(228, 201, 137, 0.12);
+      font-size: 15px;
+      margin-bottom: 26px;
+      box-shadow: 0 0 0 4px rgba(228, 201, 137, .08), 0 8px 18px rgba(0,0,0,.08);
+    }
+    .hero-main {
+      margin: 0;
+      color: #ffffff;
+      font-size: clamp(36px, 5.2vw, 68px);
+      line-height: 1.17;
+      font-weight: 900;
+      letter-spacing: -2px;
+      text-shadow: 0 3px 0 rgba(0,0,0,.10);
+    }
+    .hero-sub {
+      margin-top: 22px;
+      color: #e1c98b;
+      font-size: clamp(19px, 2.8vw, 30px);
+      line-height: 1.5;
+      font-weight: 800;
+      letter-spacing: -.6px;
+    }
+    .hero-secondary {
+      margin: 16px 0 0;
+      color: #ffffff;
+      font-size: clamp(36px, 5.2vw, 68px);
+      line-height: 1.2;
+      font-weight: 900;
+      letter-spacing: -2px;
+      text-shadow: 0 3px 0 rgba(0,0,0,.10);
+    }
+    .hero-desc {
+      margin: 12px auto 0;
+      max-width: 920px;
+      color: rgba(244, 230, 193, .96);
+      font-size: clamp(18px, 2.7vw, 25px);
+      line-height: 1.65;
+      font-weight: 700;
+      letter-spacing: -.4px;
+    }
+    @media (max-width: 860px) {
+      .top-tracker-inner { grid-template-columns: 1fr; gap: 10px; }
+      .tracker-icon-box { display: none; }
+      .hero { padding: 52px 16px 38px; }
+      .hero-main { font-size: clamp(30px, 7vw, 48px); line-height: 1.22; }
+      .hero-sub { font-size: 22px; }
+      .hero-desc { font-size: 20px; }
+    }
+    @media (max-width: 560px) {
+      .top-tracker-inner { padding: 12px 12px 10px; gap: 10px; }
+      .tracker-title { font-size: 11px; }
+      .tracker-list, .tracker-clicks { gap: 5px 10px; font-size: 13px; }
+      .chip { font-size: 13px; padding: 9px 18px; margin-bottom: 20px; }
+      .hero-main { font-size: 28px; letter-spacing: -1.2px; }
+      .hero-sub { font-size: 18px; margin-top: 18px; }
+      .hero-desc { font-size: 17px; }
+    }
+
+    .shell {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 22px 14px 84px;
+    }
+    .notice {
+      background: var(--surface);
+      border: 1px solid #d6e2dd;
+      border-radius: 20px;
+      padding: 18px 18px 16px;
+      box-shadow: 0 10px 28px rgba(23, 49, 45, 0.08);
+      margin-bottom: 12px;
+    }
+    .notice-title {
+      margin: 0 0 12px;
+      color: #506862;
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 1.4px;
+    }
+    .notice-step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .notice-step:last-child {
+      margin-bottom: 0;
+    }
+    .notice-dot {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 1px solid #bfd0c8;
+      background: #f4f8f6;
+      color: #54726b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 900;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 0 2px rgba(255,255,255,.75), 0 2px 5px rgba(0,0,0,.03);
+      margin-top: 1px;
+    }
+    .notice-step p {
+      margin: 0;
+      color: #6f8881;
+      font-size: 14px;
+      line-height: 1.8;
+      font-weight: 700;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin: 16px 0 18px;
+    }
+    .stat {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      color: var(--primary);
+      margin-bottom: 4px;
+    }
+    .stat span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(8px);
+      background: rgba(238,243,241,0.82);
+      padding: 10px 0 14px;
+    }
+    .toolbar-inner {
+      display: grid;
+      grid-template-columns: minmax(280px, 1.45fr) repeat(4, auto);
+      gap: 10px;
+      align-items: center;
+    }
+    .search-wrap {
+      position: relative;
+      width: 100%;
+    }
+    .search {
+      width: 100%;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      padding: 13px 174px 13px 14px;
+      font-size: 14px;
+      background: var(--surface);
+      color: var(--text);
+      outline: none;
+    }
+    .search:focus { border-color: var(--primary-2); box-shadow: 0 0 0 4px rgba(36, 94, 85, 0.08); }
+    .search-actions {
+      position: absolute;
+      top: 50%;
+      right: 8px;
+      transform: translateY(-50%);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .search-counter {
+      min-width: 54px;
+      height: 38px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid #d6e2dc;
+      background: #f5f8f7;
+      color: var(--muted);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: -.2px;
+    }
+    .search-icon-btn, .search-nav-btn {
+      width: 38px;
+      height: 38px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--primary);
+      color: var(--gold);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 10px rgba(23, 49, 45, 0.16);
+      transition: .16s ease;
+      padding: 0;
+    }
+    .search-nav-btn {
+      background: #2b5f57;
+      color: #f9e6b3;
+      font-size: 16px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .search-icon-btn:hover, .search-nav-btn:hover {
+      background: var(--primary-2);
+      transform: scale(1.03);
+    }
+    .search-icon-btn:disabled, .search-nav-btn:disabled {
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    .search-icon-btn svg {
+      width: 17px;
+      height: 17px;
+      stroke: currentColor;
+      stroke-width: 2.2;
+      fill: none;
+    }
+    mark.search-hit {
+      background: #fff1b8;
+      color: #17312d;
+      padding: 0 .15em;
+      border-radius: 4px;
+      box-shadow: inset 0 -1px 0 rgba(214, 186, 120, 0.55);
+      transition: background-color .16s ease, box-shadow .16s ease;
+    }
+    mark.search-hit.current-hit {
+      background: #f7d56d;
+      box-shadow: 0 0 0 3px rgba(228, 201, 137, 0.35), inset 0 -1px 0 rgba(173, 117, 0, 0.35);
+    }
+    .btn, .link-btn {
+      appearance: none;
+      border: 1px solid var(--primary-2);
+      background: var(--primary);
+      color: var(--gold);
+      border-radius: 12px;
+      padding: 13px 14px;
+      font-size: 14px;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: .16s ease;
+      white-space: nowrap;
+      min-height: 48px;
+    }
+    .btn:hover, .link-btn:hover { transform: translateY(-1px); background: var(--primary-2); }
+    .btn.sub, .link-btn.sub {
+      background: var(--surface);
+      color: var(--primary);
+      border-color: var(--line-strong);
+    }
+    .btn.sub:hover, .link-btn.sub:hover {
+      background: var(--primary-light, #eef5f2);
+      color: var(--primary);
+    }
+    .section-title {
+      margin: 22px 0 12px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+    .list {
+      display: grid;
+      gap: 14px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .card-head {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding: 18px 18px 14px;
+      background: linear-gradient(180deg, #f7faf8 0%, #edf4f1 100%);
+      border-bottom: 1px solid #e2ece8;
+    }
+    .num {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      font-weight: 900;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 4px rgba(36,94,85,.08);
+    }
+    .meta {
+      font-size: 11px;
+      color: var(--primary-2);
+      font-weight: 800;
+      letter-spacing: .4px;
+      margin-bottom: 6px;
+    }
+    .title {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.45;
+      font-weight: 900;
+      color: var(--text);
+    }
+    .body {
+      padding: 16px 18px 18px;
+    }
+    .excerpt {
+      background: #f4f8f6;
+      border: 1px solid #d8e4de;
+      border-radius: 12px;
+      padding: 12px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+    .content {
+      display: none;
+      background: var(--surface-2);
+      border: 1px solid #dde8e3;
+      border-radius: 12px;
+      padding: 14px;
+      white-space: pre-wrap;
+      word-break: keep-all;
+      font-size: 14px;
+      line-height: 1.85;
+      max-height: 360px;
+      overflow: auto;
+      margin-bottom: 12px;
+    }
+    .card.open .content { display: block; }
+    .actions {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+    .mini-note {
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .empty {
+      display: none;
+      text-align: center;
+      padding: 28px 16px;
+      background: var(--surface);
+      border: 1px dashed var(--line-strong);
+      border-radius: 16px;
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .guide {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      margin-top: 18px;
+    }
+    .step {
+      display: flex;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid var(--line-strong);
+      background: #edf4f1;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 900;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .step p {
+      margin: 0;
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+    .footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.8;
+      padding-top: 18px;
+    }
+    .footer-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 18px;
+      border-radius: 14px;
+      background: var(--primary);
+      color: #ffffff;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1.35;
+      box-shadow: 0 8px 18px rgba(23, 49, 45, 0.14);
+      margin-bottom: 10px;
+    }
+    .footer-supporter {
+      display: block;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.7;
+    }
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%) translateY(12px);
+      background: #0f2925;
+      color: #f5ead0;
+      padding: 12px 16px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+      opacity: 0;
+      pointer-events: none;
+      transition: .2s ease;
+      box-shadow: 0 12px 28px rgba(15, 41, 37, 0.22);
+      z-index: 99;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    body.gate-locked { overflow: hidden; }
+    .page-content.locked {
+      filter: blur(7px) brightness(.48);
+      transform: scale(1.01);
+      pointer-events: none;
+      user-select: none;
+      transition: filter .28s ease, transform .28s ease;
+    }
+    .page-content { transition: filter .28s ease, transform .28s ease; }
+    .entry-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 120;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(5, 14, 13, .58);
+      backdrop-filter: blur(7px);
+    }
+    .entry-overlay.hidden { display: none; }
+    .entry-modal {
+      width: min(850px, 100%);
+      background: #123a34;
+      border: 1.6px solid rgba(84, 181, 169, .55);
+      border-radius: 34px;
+      box-shadow: 0 28px 80px rgba(0,0,0,.34);
+      padding: 54px 52px 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .entry-modal::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% -10%, rgba(228, 201, 137, .12), transparent 42%);
+      pointer-events: none;
+    }
+    .entry-kicker {
+      color: #b7c6c0;
+      font-size: clamp(20px, 2.8vw, 30px);
+      font-weight: 900;
+      letter-spacing: -.3px;
+      margin-bottom: 18px;
+    }
+    .entry-title {
+      margin: 0;
+      color: #f2d393;
+      font-size: clamp(40px, 5vw, 58px);
+      line-height: 1.2;
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      text-shadow: 0 2px 0 rgba(0,0,0,.18);
+    }
+    .entry-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin: 44px 0 28px;
+    }
+    .entry-option {
+      min-height: 126px;
+      border-radius: 20px;
+      border: 4px solid rgba(90, 90, 90, .88);
+      background: #1e1e1f;
+      color: #b6bdc9;
+      font-size: clamp(16px, 1.7vw, 20px);
+      line-height: 1.35;
+      font-weight: 900;
+      letter-spacing: -.4px;
+      padding: 18px 12px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.03), 0 8px 16px rgba(0,0,0,.12);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      text-align: center;
+    }
+    .entry-option span {
+      display: block;
+      white-space: nowrap;
+    }
+    .entry-option.wide { grid-column: span 2; min-height: 112px; }
+    .entry-option {
+      position: relative;
+      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, background .18s ease, color .18s ease;
+      cursor: pointer;
+      user-select: none;
+    }
+    .entry-option::after {
+      content: "✓ 선택됨";
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: rgba(120, 196, 184, .16);
+      color: #dff8f3;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: -.2px;
+      opacity: 0;
+      transform: translateY(-4px);
+      transition: .18s ease;
+      pointer-events: none;
+    }
+    .entry-option:hover {
+      transform: translateY(-2px);
+      background: #232425;
+      border-color: rgba(133, 133, 133, .95);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 12px 20px rgba(0,0,0,.16);
+    }
+    .entry-option:active {
+      transform: scale(.985);
+    }
+    .entry-option.selected {
+      color: #fff8e3;
+      border-color: #95f3e4;
+      background: linear-gradient(180deg, #29524f 0%, #356864 100%);
+      box-shadow: 0 0 0 7px rgba(127, 226, 210, .20), 0 18px 30px rgba(4, 20, 18, .30), inset 0 1px 0 rgba(255,255,255,.08);
+      transform: translateY(-3px) scale(1.045);
+    }
+    .entry-option.selected::after {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .enter-btn.ready {
+      background: linear-gradient(180deg, #3b9386 0%, #31786f 100%);
+      border-color: rgba(173, 248, 234, .55);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 20px 30px rgba(8, 33, 30, .30), 0 0 0 6px rgba(127, 226, 210, .14);
+      animation: readyPulse 1.15s ease-in-out infinite;
+    }
+    @keyframes readyPulse {
+      0%, 100% { transform: scale(1); box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 18px 28px rgba(8, 33, 30, .28), 0 0 0 5px rgba(127, 226, 210, .12); }
+      50% { transform: scale(1.01); box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 18px 28px rgba(8, 33, 30, .32), 0 0 0 9px rgba(127, 226, 210, .08); }
+    }
+    .entry-help {
+      margin: 6px 0 20px;
+      color: #d0d7d2;
+      font-size: clamp(18px, 2.2vw, 24px);
+      line-height: 1.6;
+    }
+    .enter-btn {
+      width: 100%;
+      min-height: 92px;
+      border-radius: 22px;
+      border: 1px solid rgba(122, 214, 197, .22);
+      background: linear-gradient(180deg, #2f756b 0%, #2c6c62 100%);
+      color: #f3d59a;
+      font-size: clamp(24px, 3vw, 34px);
+      font-weight: 900;
+      letter-spacing: -.6px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.07), 0 16px 24px rgba(8, 33, 30, .22);
+    }
+    .enter-btn.is-disabled {
+      opacity: .58;
+      cursor: not-allowed;
+      transform: none !important;
+      filter: grayscale(.15);
+    }
+    .selected-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: linear-gradient(180deg, #f7fbf9 0%, #eef6f2 100%);
+      border: 1px solid var(--line-strong);
+      border-radius: 16px;
+      padding: 14px 16px;
+      margin: 14px 0 18px;
+      box-shadow: var(--shadow);
+    }
+    .selected-banner.hidden { display: none; }
+    .selected-copy strong { color: var(--primary); font-size: 15px; display: block; margin-bottom: 3px; }
+    .selected-copy span { color: var(--muted); font-size: 13px; }
+    .selected-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: var(--gold-bg);
+      color: #7d6023;
+      border: 1px solid var(--gold-line);
+      font-size: 12px;
+      font-weight: 800;
+      margin-top: 6px;
+    }
+    @media (max-width: 860px) {
+      .entry-modal { padding: 42px 24px 26px; border-radius: 28px; }
+      .entry-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 34px; }
+      .entry-option, .entry-option.wide { grid-column: span 1; min-height: 104px; }
+      .entry-help { font-size: 18px; }
+      .enter-btn { min-height: 78px; }
+      .selected-banner { flex-direction: column; align-items: stretch; }
+    }
+    @media (max-width: 560px) {
+      .entry-modal { padding: 34px 16px 18px; border-radius: 24px; }
+      .entry-title { font-size: 34px; line-height: 1.26; }
+      .entry-kicker { font-size: 17px; margin-bottom: 12px; }
+      .entry-grid { gap: 12px; }
+      .entry-option { min-height: 92px; border-width: 3px; font-size: 16px; }
+      .entry-help { font-size: 16px; margin-bottom: 14px; }
+      .enter-btn { min-height: 72px; font-size: 24px; }
+    }
+
+    @media (max-width: 860px) {
+      .stats { grid-template-columns: repeat(2, 1fr); }
+      .toolbar-inner { grid-template-columns: 1fr 1fr; }
+      .actions { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 560px) {
+      .shell { padding: 18px 12px 72px; }
+      .hero { padding: 40px 14px 28px; }
+      .toolbar-inner { grid-template-columns: 1fr; }
+      .stats { grid-template-columns: 1fr 1fr; }
+      .actions { grid-template-columns: 1fr; }
+      .card-head { padding: 16px 16px 12px; }
+      .body { padding: 14px 16px 16px; }
+    }
+  </style>
+</head>
+<body class="gate-locked">
+  <div id="entryPopup" class="entry-overlay">
+    <div class="entry-modal" role="dialog" aria-modal="true" aria-labelledby="entryTitle">
+      <div class="entry-kicker">검단신도시 5단계 교통 민원</div>
+      <h2 id="entryTitle" class="entry-title">입장 전 해당하는 정보를<br>선택해 주세요.</h2>
+      <div class="entry-grid">
+        <button type="button" class="entry-option" data-profile="검단신도시 푸르지오 더 파크" onclick="handleEntryOptionClick(this)"><span>검단신도시</span><span>푸르지오 더 파크</span></button>
+        <button type="button" class="entry-option" data-profile="이편한세상 검단 에코비스타" onclick="handleEntryOptionClick(this)"><span>이편한세상</span><span>검단 에코비스타</span></button>
+        <button type="button" class="entry-option" data-profile="더샵 검단레이크파크" onclick="handleEntryOptionClick(this)"><span>더샵</span><span>검단레이크파크</span></button>
+        <button type="button" class="entry-option" data-profile="엘리프 검단 포레듀" onclick="handleEntryOptionClick(this)"><span>엘리프</span><span>검단 포레듀</span></button>
+        <button type="button" class="entry-option wide" data-profile="검단신도시 입주예정자 및 입주민" onclick="handleEntryOptionClick(this)"><span>검단신도시</span><span>입주예정자 및 입주민</span></button>
+        <button type="button" class="entry-option wide" data-profile="원도심 입주민" onclick="handleEntryOptionClick(this)"><span>원도심</span><span>입주민</span></button>
+      </div>
+      <p class="entry-help">버튼 선택 후 바로 입장하실 수 있습니다 😊</p>
+      <button type="button" id="enterSiteBtn" class="enter-btn is-disabled" onclick="return handleEnterSite()">입장하기 →</button>
+    </div>
+  </div>
+  <div id="pageContent" class="page-content locked">
+  <div class="top-tracker">
+    <div class="top-tracker-inner">
+      <div class="tracker-col">
+        <div class="tracker-title">유형별 방문자</div>
+        <div class="tracker-list" id="entryCountList"></div>
+      </div>
+      <div class="tracker-col">
+        <div class="tracker-title">민원접수 클릭</div>
+        <div class="tracker-clicks" id="clickCountList"></div>
+      </div>
+      <div class="tracker-icon-box" aria-hidden="true">🔐</div>
+    </div>
+  </div>
+  <header class="hero">
+    <div class="chip">검단신도시 5단계 교통 민원</div>
+    <h1 class="hero-main">검단구청역(가칭)을 중심으로<br>3개 철도가 연결되어야 합니다.</h1>
+    <div class="hero-secondary">경찰서역(가칭)을 중심으로<br>2개 철도가 연결되어야 합니다.</div>
+    <div class="hero-sub">인천1호선 · 인천2호선 고양 연장선 · 인천순환3호선 · 대장-홍대선</div><div class="hero-desc">지금 주민 여러분의 민원이 필요합니다</div>
+  </header>
+
+  <main class="shell">
+    <section class="notice">
+      <div class="notice-title">접수 가이드</div>
+      <div class="notice-step"><div class="notice-dot">1</div><p>원하는 민원을 펼친 뒤 <strong>민원 내용 복사</strong> 또는 <strong>제목 복사</strong> 버튼을 눌러 주세요.</p></div>
+      <div class="notice-step"><div class="notice-dot">2</div><p><strong>국민신문고 바로가기</strong> 버튼으로 이동한 뒤 로그인하고 민원 신청 메뉴로 들어가세요.</p></div>
+      <div class="notice-step"><div class="notice-dot">3</div><p>복사한 내용을 붙여넣고, 본인 거주 상황이나 생활권 특성을 1~2문장 덧붙여 제출하면 활용도가 높아집니다.</p></div>
+      <div class="notice-step"><div class="notice-dot">4</div><p>같은 표현을 반복하기보다 민원마다 강조 포인트를 조금씩 바꾸어 제출하면 문안의 차별성을 살릴 수 있습니다.</p></div>
+    </section>
+
+    <section id="selectedBanner" class="selected-banner hidden">
+      <div class="selected-copy">
+        <strong>선택된 입장</strong>
+        <span>선택 정보는 참고용이며, 아래 모든 민원을 자유롭게 열람하고 복사할 수 있습니다.</span>
+        <div id="selectedProfileText" class="selected-pill">선택 전</div>
+      </div>
+      <button class="btn sub" type="button" onclick="reopenEntryPopup()">입장 선택 다시하기</button>
+    </section>
+
+    <section class="stats">
+      <div class="stat"><strong id="totalCount">20</strong><span>총 문안 수</span></div>
+      <div class="stat"><strong>개별</strong><span>카드별 복사</span></div>
+      <div class="stat"><strong>전체</strong><span>한 번에 복사</span></div>
+      <div class="stat"><strong>검색</strong><span>키워드 필터</span></div>
+    </section>
+
+    <section class="toolbar">
+      <div class="toolbar-inner">
+        <div class="search-wrap">
+          <input id="searchInput" class="search" type="search" placeholder="제목, 내용, 키워드로 검색해 보세요" oninput="performSearch()" onchange="performSearch()" onsearch="performSearch()" autocomplete="off" />
+          <div class="search-actions">
+            <div id="searchCounter" class="search-counter" aria-live="polite">0 / 0</div>
+            <button class="search-nav-btn" id="searchPrevBtn" type="button" onclick="goToSearchHit(-1)" aria-label="이전 검색 결과">↑</button>
+            <button class="search-nav-btn" id="searchNextBtn" type="button" onclick="goToSearchHit(1)" aria-label="다음 검색 결과">↓</button>
+            <button class="search-icon-btn" type="button" onclick="performSearchAndFocusFirst()" aria-label="검색">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="6.5"></circle><path d="M16 16L21 21"></path></svg>
+            </button>
+          </div>
+        </div>
+        <button class="btn" onclick="copyAll()">전체 민원 복사</button>
+        <button class="btn sub" onclick="expandAll()">모두 펼치기</button>
+        <button class="btn sub" onclick="collapseAll()">모두 접기</button>
+        <a class="link-btn sub" href="https://www.epeople.go.kr" target="_blank" rel="noopener">민원 접수하러 가기</a>
+      </div>
+    </section>
+
+    <div class="section-title">민원 목록</div>
+    <section id="list" class="list"></section>
+    <div id="emptyState" class="empty">검색 결과가 없습니다. 다른 키워드로 다시 찾아보세요.</div>
+
+    <div class="footer"><span class="footer-badge">Made by 투자왕(박정한)</span><span class="footer-supporter">1기 서포터즈 멤버 : 스테디(양기석)</span></div>
+  </main>
+
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const petitions = [
+  {
+    "id": "1",
+    "label": "민원 1",
+    "title": "검단구 출범에 따른 행정·광역교통 종합계획 수립 및 관계기관 협의를 요청드립니다.",
+    "content": "제목\n\n검단구 출범에 따른 행정·광역교통 종합계획 수립 및 관계기관 협의를 요청드립니다.\n\n안녕하십니까.\n\n2026년 7월 1일 검단구가 공식 출범하면서 검단은 독립된 행정체계를 갖춘 새로운 도시로 첫걸음을 내딛게 되었습니다. 이에 따라 검단구는 행정기능 강화와 함께 주거·교통·공공시설 확충이 동시에 이루어져야 하는 중요한 전환기를 맞이하고 있습니다.\n\n현재 검단구는 대규모 공동주택 개발과 공공주택 공급이 지속적으로 이루어지고 있으며, 앞으로도 상당한 규모의 인구 유입이 예상됩니다.\n\n특히 검단구청 신청사 예정지 생활권에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대) 등 대규모 공동주택이 위치하고 있습니다.\n\n또한 워라밸빌리지에는 공공임대주택과 행복주택이 계획되어 있으며, 휴먼에너지타운에는 AA33 공동주택(830세대)과 B2 연립주택(316세대)이 조성될 예정입니다.\n\n이처럼 신청사 예정지 생활권과 검단 남측 생활권에는 앞으로도 지속적인 인구 증가가 예상되는 만큼, 지금부터 장기적인 행정 및 광역교통계획을 함께 준비해야 한다고 생각합니다.\n\n우선 검단구청 신청사는 당초 계획된 업무14부지에 원안대로 조속히 확정하여 주시고, 주민들이 미래 도시계획을 예측할 수 있도록 신청사 건립 추진계획을 조기에 발표하여 주시기를 요청드립니다.\n\n또한 신청사 예정지는 앞으로 검단구를 대표하는 행정 중심지가 될 예정인 만큼, 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 검단구청역(가칭) 조성 가능성도 장기적인 도시계획 차원에서 심도 있게 검토하여 주시기를 바랍니다.\n\n아울러 현재 추진 중인 인천2호선 고양연장 사업은 검단 남측 생활권의 교통 접근성 향상과 수도권 서북부 광역교통망 구축을 위해 매우 중요한 사업이라고 생각합니다.\n\n따라서 인천2호선 고양연장 사업이 예비타당성조사를 성공적으로 통과하여 계획대로 추진될 수 있도록 적극적인 관심과 지원을 부탁드립니다.\n\n특히 인천2호선 고양연장 노선의 경찰서역(가칭)은 인근의 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 주요 공공기관 이용 편의성을 높이는 핵심 거점이 될 것으로 예상됩니다.\n\n이에 따라 경찰서역(가칭)은 단순한 일반역으로 계획하기보다는 향후 대장홍대선과 연계되는 환승체계도 함께 종합적으로 검토하여 검단 남측의 행정·공공서비스 중심축으로 발전할 수 있도록 검토하여 주시기를 요청드립니다.\n\n또한 향후 대장홍대선의 계양 연장을 검토하는 과정에서는 급속한 인구 증가가 예상되는 검단구의 도시 여건과 장래 교통수요를 충분히 반영하여, 검단 연장 가능성 역시 함께 심도 있게 논의하고 검토하여 주시기를 부탁드립니다.\n\n검단구는 이제 막 출범한 새로운 자치구입니다. 지금 수립되는 행정계획과 철도망 계획은 향후 수십 년간 검단구의 발전 방향을 결정하는 중요한 기반이 될 것입니다.\n\n따라서 인천광역시, 검단구, 국토교통부, 철도 관련 기관, 지역 정치권 및 관계 공무원께서는 검단구의 미래 발전을 위해 ▲업무14부지 검단구청 신청사 원안 추진 및 조기 확정 ▲인천2호선 고양연장 예비타당성조사 통과 ▲경찰서역(가칭)과 대장홍대선 환승체계 검토 ▲대장홍대선 계양 연장 검토 시 검단 연장 가능성 논의 ▲검단구청역(가칭)을 중심으로 한 인천1호선 연장·인천순환3호선·대장홍대선 연계 방안 등을 긴밀히 협의하고 적극적으로 추진하여 주시기를 요청드립니다.\n\n검단구의 지속가능한 발전과 미래 경쟁력 확보를 위해 적극적인 검토와 협조를 부탁드립니다.\n\n감사합니다."
+  },
+  {
+    "id": "2",
+    "label": "민원 2",
+    "title": "검단구의 지속적인 인구 증가에 대비한 선제적인 행정·광역교통계획 수립을 요청드립니다.",
+    "content": "제목\n\n검단구의 지속적인 인구 증가에 대비한 선제적인 행정·광역교통계획 수립을 요청드립니다.\n\n안녕하십니까.\n\n2026년 7월 검단구가 공식 출범하면서 검단은 새로운 행정도시로 성장하기 위한 중요한 전환점을 맞이하였습니다. 행정구역의 변화와 함께 검단신도시는 대규모 공동주택 공급과 도시개발이 동시에 진행되고 있으며, 앞으로도 지속적인 인구 유입이 예상됩니다.\n\n검단구청 신청사 예정지 생활권에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대)가 위치하고 있으며, 워라밸빌리지에는 공공임대주택과 행복주택이 계획되어 있습니다.\n\n또한 인근 휴먼에너지타운에는 AA33 공동주택(830세대)과 B2 연립주택(316세대)이 조성될 예정으로, 향후 검단구는 지금보다 훨씬 많은 행정수요와 교통수요가 발생할 것으로 예상됩니다.\n\n도시는 인구가 증가한 이후 기반시설을 확충하는 것보다 미래 수요를 예측하여 선제적으로 준비하는 것이 훨씬 효율적입니다.\n\n이에 업무14부지 검단구청 신청사를 원안대로 조속히 확정하고 건립 추진계획을 구체적으로 발표하여 주시기를 요청드립니다.\n\n또한 신청사 예정지는 향후 검단구의 행정 중심지인 만큼 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 검단구청역(가칭)을 함께 검토하여 행정과 광역교통이 유기적으로 연결되는 중심축으로 발전시켜 주시기를 바랍니다.\n\n아울러 현재 추진 중인 인천2호선 고양연장 사업은 반드시 예비타당성조사를 통과하여 계획대로 추진되어야 한다고 생각합니다.\n\n특히 경찰서역(가칭)은 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 주요 공공기관 이용 편의를 높이는 중요한 거점이 될 수 있으므로, 대장홍대선과 연계되는 환승체계도 함께 검토해 주시기를 요청드립니다.\n\n더불어 향후 대장홍대선 계양 연장을 검토하는 과정에서는 검단의 지속적인 인구 증가와 도시개발 여건을 충분히 반영하여 검단 연장 가능성도 함께 심도 있게 논의하고 검토하여 주시기를 부탁드립니다.\n\n검단구의 미래 경쟁력 확보를 위해 인천광역시, 검단구, 국토교통부, 철도 관계기관, 지역 정치권 및 관계 공무원들이 긴밀히 협의하여 신청사와 광역철도망을 종합적으로 검토하고 적극 추진해 주시기를 요청드립니다."
+  },
+  {
+    "id": "3",
+    "label": "민원 3",
+    "title": "워라밸빌리지 개발에 맞춘 장기 교통대책 마련을 요청드립니다.",
+    "content": "제목\n\n워라밸빌리지 개발에 맞춘 장기 교통대책 마련을 요청드립니다.\n\n안녕하십니까.\n\n검단구 출범 이후 검단신도시의 개발 속도는 더욱 빨라지고 있습니다.\n\n특히 워라밸빌리지에는 더샵 검단레이크파크(2,857세대)와 함께 공공임대주택, 행복주택이 계획되어 있어 앞으로 상당한 규모의 인구 유입이 예상됩니다.\n\n도시가 성장하면 가장 먼저 필요한 것은 행정과 교통입니다.\n\n이에 따라 검단구청 신청사는 업무14부지에 원안대로 조속히 확정하여 검단구의 행정 중심 기능을 강화하여 주시기를 요청드립니다.\n\n또한 신청사 예정지는 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연결하는 검단구청역(가칭)을 장기적으로 검토하여 광역교통의 중심지로 발전시켜 주시기를 바랍니다.\n\n아울러 인천2호선 고양연장 사업의 예비타당성조사가 반드시 통과될 수 있도록 적극 추진하여 주시기를 요청드립니다.\n\n특히 워라밸빌리지 남측에 계획된 경찰서역(가칭)은 검단경찰서, 소방서, 우체국, 검단구 임시청사와 가까워 공공서비스 접근성을 크게 높일 수 있는 역입니다.\n\n향후 대장홍대선과 환승할 수 있는 체계도 함께 검토하여 검단 남측 생활권의 교통 편의를 높여 주시기를 바랍니다.\n\n또한 대장홍대선 계양 연장을 검토할 경우 검단 연장 가능성도 함께 심도 있게 검토하여 장기적인 국가철도망 구축 방향에 반영해 주시기를 요청드립니다."
+  },
+  {
+    "id": "4",
+    "label": "민원 4",
+    "title": "휴먼에너지타운 개발에 대비한 광역교통망 검토를 요청드립니다.",
+    "content": "제목\n\n휴먼에너지타운 개발에 대비한 광역교통망 검토를 요청드립니다.\n\n안녕하십니까.\n\n검단구는 신청사 예정지뿐 아니라 휴먼에너지타운 개발도 함께 진행되고 있습니다.\n\n휴먼에너지타운에는 AA33 공동주택(830세대)과 B2 연립주택(316세대)가 계획되어 있어 향후 생활권 확대와 함께 교통수요도 증가할 것으로 예상됩니다.\n\n이러한 변화에 대비하기 위해서는 인천2호선 고양연장 사업의 예비타당성조사를 성공적으로 통과시키고, 경찰서역(가칭)을 중심으로 대장홍대선과 연계되는 환승체계도 함께 검토할 필요가 있다고 생각합니다.\n\n또한 검단구청 신청사는 업무14부지에 원안대로 추진하고, 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 방안도 함께 검토하여 주시기를 요청드립니다.\n\n아울러 향후 대장홍대선 계양 연장 검토 시 검단 연장 가능성까지 종합적으로 논의하여 검단구의 미래 교통수요를 반영해 주시기를 부탁드립니다.\n\n인천광역시와 검단구, 국토교통부, 철도 관계기관 및 지역 정치권이 긴밀히 협력하여 검단구의 장기적인 발전을 위한 정책을 적극 추진해 주시기를 요청드립니다."
+  },
+  {
+    "id": "5",
+    "label": "민원 5",
+    "title": "검단구청역(가칭) 중심의 행정·광역교통 허브 구축을 요청드립니다.",
+    "content": "제목\n\n검단구청역(가칭) 중심의 행정·광역교통 허브 구축을 요청드립니다.\n\n안녕하십니까.\n\n2026년 검단구 출범 이후 검단은 독립된 행정체계를 갖춘 새로운 도시로 성장하고 있으며, 신청사 건립과 대규모 공동주택 개발이 동시에 추진되고 있습니다.\n\n현재 신청사 예정지 생활권에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대)가 위치하고 있으며, 향후 워라밸빌리지의 공공임대주택과 행복주택, 휴먼에너지타운의 AA33 공동주택(830세대) 및 B2 연립주택(316세대)까지 조성되면 이 일대는 검단구의 핵심 생활권으로 성장할 것으로 예상됩니다.\n\n이처럼 대규모 인구 유입이 예정된 만큼 업무14부지 검단구청 신청사를 원안대로 조속히 확정하여 검단구의 행정 중심 기능을 강화해 주시기를 요청드립니다.\n\n아울러 신청사 건립과 함께 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 환승체계를 장기적인 도시계획 속에서 종합적으로 검토하여 주시기를 바랍니다.\n\n또한 검단구청역(가칭)은 단순한 철도역이 아니라 행정, 교통, 상업, 업무 기능이 결합된 검단구의 중심 거점으로 발전할 수 있도록 관련 계획을 함께 검토해 주시기를 요청드립니다.\n\n검단구의 미래 경쟁력을 높이기 위해 관계기관의 적극적인 검토를 부탁드립니다."
+  },
+  {
+    "id": "6",
+    "label": "민원 6",
+    "title": "인천2호선 고양연장 예비타당성조사의 성공적인 통과를 요청드립니다.",
+    "content": "제목\n\n인천2호선 고양연장 예비타당성조사의 성공적인 통과를 요청드립니다.\n\n안녕하십니까.\n\n검단구는 출범 이후 도시개발과 인구 증가가 빠르게 진행되고 있습니다.\n\n특히 더샵 검단레이크파크(2,857세대)를 비롯하여 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대), 워라밸빌리지의 공공임대주택과 행복주택, 휴먼에너지타운의 AA33 공동주택(830세대) 및 B2 연립주택(316세대) 등 대규모 주거단지가 조성되고 있습니다.\n\n이처럼 지속적인 인구 유입이 예정된 만큼 인천2호선 고양연장 사업은 반드시 예비타당성조사를 통과하여 계획대로 추진될 필요가 있습니다.\n\n이는 검단 남측 생활권의 교통 접근성 향상뿐 아니라 향후 검단구 전체의 균형 있는 발전에도 중요한 기반이 될 것입니다.\n\n또한 경찰서역(가칭)은 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 주요 공공기관 접근성을 높이는 거점이 될 것으로 예상되는 만큼, 향후 대장홍대선과 연계되는 환승체계도 함께 검토하여 주시기를 요청드립니다.\n\n아울러 대장홍대선 계양 연장을 검토하는 과정에서는 검단 연장 가능성도 함께 심도 있게 논의하여 미래 교통수요를 반영한 장기적인 철도망 구축이 이루어질 수 있도록 적극 검토해 주시기를 부탁드립니다."
+  },
+  {
+    "id": "7",
+    "label": "민원 7",
+    "title": "경찰서역(가칭)의 광역 환승체계 구축을 검토하여 주시기 바랍니다.",
+    "content": "제목\n\n경찰서역(가칭)의 광역 환승체계 구축을 검토하여 주시기 바랍니다.\n\n안녕하십니까.\n\n검단구는 새로운 행정도시로 성장하면서 행정시설과 공공기관이 지속적으로 확충되고 있습니다.\n\n특히 인천2호선 고양연장 노선에 계획된 경찰서역(가칭) 주변에는 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 주요 공공기관이 위치하고 있어 향후 검단 남측의 행정·공공서비스 중심축으로 발전할 가능성이 높다고 생각합니다.\n\n따라서 우선 인천2호선 고양연장 사업이 예비타당성조사를 성공적으로 통과하여 계획대로 추진될 수 있도록 적극적인 지원을 요청드립니다.\n\n또한 경찰서역(가칭)은 장기적인 관점에서 대장홍대선과 연계되는 환승체계를 함께 검토하여 검단 남측 생활권의 광역교통 거점으로 발전할 수 있도록 심도 있게 검토하여 주시기를 바랍니다.\n\n더불어 향후 대장홍대선 계양 연장 검토 시 검단 연장 가능성도 함께 논의하여 검단구의 미래 교통수요와 도시개발 여건을 충분히 반영해 주시기를 요청드립니다.\n\n아울러 검단구청 신청사는 업무14부지에 원안대로 조속히 확정하고, 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 환승체계도 함께 검토하여 검단구 전체의 교통 경쟁력을 높여 주시기를 바랍니다.\n\n인천광역시, 검단구, 국토교통부, 철도 관계기관, 지역 정치권이 긴밀히 협력하여 검단구의 미래를 위한 종합적인 행정·광역교통 정책을 적극 추진해 주시기를 요청드립니다."
+  },
+  {
+    "id": "8",
+    "label": "민원 8",
+    "title": "대장홍대선 계양 연장 검토 시 검단 연장 가능성도 함께 심도 있게 검토하여 주시기 바랍니다.",
+    "content": "제목\n\n대장홍대선 계양 연장 검토 시 검단 연장 가능성도 함께 심도 있게 검토하여 주시기 바랍니다.\n\n안녕하십니까.\n\n검단구는 2026년 7월 공식 출범 이후 행정도시로서 빠르게 성장하고 있으며, 대규모 공동주택 공급과 공공시설 확충이 동시에 이루어지고 있습니다.\n\n현재 신청사 예정지 생활권에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대)가 위치하고 있으며, 워라밸빌리지에는 공공임대주택과 행복주택이 계획되어 있습니다.\n\n또한 휴먼에너지타운에는 AA33 공동주택(830세대)과 B2 연립주택(316세대)이 조성될 예정으로 앞으로도 지속적인 인구 증가가 예상됩니다.\n\n이처럼 도시 규모가 지속적으로 확대되는 상황에서는 장래 교통수요를 고려한 철도망 계획이 함께 검토되어야 한다고 생각합니다.\n\n현재 추진 중인 인천2호선 고양연장 사업은 반드시 예비타당성조사를 성공적으로 통과하여 계획대로 추진되어야 하며, 향후 대장홍대선 계양 연장을 검토하는 과정에서는 검단 연장 가능성도 함께 심도 있게 논의하여 주시기를 요청드립니다.\n\n특히 인천2호선 경찰서역(가칭)은 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 주요 공공기관과 연계되는 중요한 위치에 있는 만큼, 장기적으로 대장홍대선과 환승할 수 있는 체계도 함께 검토하여 검단 남측 생활권의 교통 편의를 높여 주시기를 바랍니다.\n\n또한 업무14부지 검단구청 신청사는 원안대로 조속히 확정하고, 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 환승체계도 함께 검토하여 검단구 전체의 광역교통 경쟁력을 높여 주시기를 요청드립니다."
+  },
+  {
+    "id": "9",
+    "label": "민원 9",
+    "title": "검단구 발전을 위한 관계기관 공동협의체 구성을 요청드립니다.",
+    "content": "제목\n\n검단구 발전을 위한 관계기관 공동협의체 구성을 요청드립니다.\n\n안녕하십니까.\n\n검단구는 출범 이후 신청사 건립, 철도망 구축, 공동주택 공급 등 다양한 사업이 동시에 추진되고 있습니다.\n\n신청사 예정지 생활권에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대)가 위치하고 있으며, 워라밸빌리지의 공공임대주택과 행복주택, 휴먼에너지타운의 AA33 공동주택(830세대) 및 B2 연립주택(316세대)까지 조성되면 검단구의 행정 및 교통수요는 크게 증가할 것으로 예상됩니다.\n\n그러나 이러한 사업들은 어느 한 기관만으로 추진하기 어렵습니다.\n\n따라서 인천광역시, 검단구, 국토교통부, 국가철도 관련 기관, 지역 정치권 및 관계 공무원들이 함께 참여하는 협의체를 구성하여 검단구의 미래 발전 방향을 종합적으로 논의해 주시기를 요청드립니다.\n\n협의 과정에서는 다음 사항을 함께 검토해 주시기 바랍니다.\n\n업무14부지 검단구청 신청사 원안 추진 및 조기 확정\n인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 검단구청역(가칭) 검토\n인천2호선 고양연장 예비타당성조사 통과 지원\n경찰서역(가칭)과 대장홍대선 환승체계 검토\n대장홍대선 계양 연장 검토 시 검단 연장 가능성에 대한 심도 있는 논의\n\n검단구가 장기적으로 경쟁력 있는 도시로 성장할 수 있도록 적극적인 협의를 부탁드립니다."
+  },
+  {
+    "id": "10",
+    "label": "민원 10",
+    "title": "검단구의 미래 발전을 위한 행정·철도·도시계획의 종합적인 추진을 요청드립니다.",
+    "content": "제목\n\n검단구의 미래 발전을 위한 행정·철도·도시계획의 종합적인 추진을 요청드립니다.\n\n안녕하십니까.\n\n2026년 검단구 출범은 단순한 행정구역 개편이 아니라 검단의 미래를 새롭게 설계하는 중요한 출발점이라고 생각합니다.\n\n현재 검단구에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대) 등 대규모 공동주택이 조성되어 있으며, 워라밸빌리지에는 공공임대주택과 행복주택, 휴먼에너지타운에는 AA33 공동주택(830세대)과 B2 연립주택(316세대)가 계획되어 있습니다.\n\n이처럼 지속적인 인구 증가가 예상되는 만큼 도시 기반시설 역시 장기적인 관점에서 함께 준비되어야 합니다.\n\n이에 업무14부지 검단구청 신청사를 원안대로 조속히 확정하여 검단구의 행정 중심 기능을 강화하여 주시기를 요청드립니다.\n\n또한 신청사 예정지는 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 검단구청역(가칭)을 중심으로 장기적인 환승체계를 검토하여 검단구의 대표 행정·교통 중심지로 육성하여 주시기를 바랍니다.\n\n아울러 인천2호선 고양연장 사업은 예비타당성조사를 성공적으로 통과하여 계획대로 추진되어야 하며, 경찰서역(가칭)은 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 공공기관 접근성을 높이는 거점으로서 대장홍대선과 연계되는 환승체계도 함께 검토하여 주시기를 요청드립니다.\n\n더불어 향후 대장홍대선 계양 연장 검토 시에는 검단 연장 가능성도 함께 심도 있게 논의하여 검단구의 장래 인구 증가와 도시개발 계획을 충분히 반영한 광역철도망을 구축해 주시기를 바랍니다.\n\n끝으로 검단구의 미래는 행정, 도시계획, 철도, 주거정책이 유기적으로 연결될 때 더욱 경쟁력을 갖출 수 있습니다.\n\n따라서 인천광역시, 검단구, 국토교통부, 철도 관련 기관, 지역 정치권 및 관계 공무원께서 긴밀히 협력하여 검단구의 미래 발전을 위한 종합적인 계획을 수립하고, 주민들의 의견을 적극 검토하여 실질적인 정책으로 이어질 수 있도록 적극 추진하여 주시기를 요청드립니다.\n\n감사합니다."
+  },
+  {
+    "id": "11",
+    "label": "민원 11",
+    "title": "검단구의 미래 행정수요를 고려한 광역철도망 구축을 요청드립니다.",
+    "content": "제목\n\n검단구의 미래 행정수요를 고려한 광역철도망 구축을 요청드립니다.\n\n안녕하십니까.\n\n검단구는 2026년 7월 공식 출범 이후 행정기능과 도시기능이 빠르게 확대되고 있습니다.\n\n새로운 자치구 출범은 단순히 행정구역이 바뀌는 것이 아니라, 앞으로 수십 년 동안 검단구의 발전 방향을 결정하는 중요한 출발점이라고 생각합니다.\n\n현재 신청사 예정지 생활권에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대)가 위치하고 있으며, 워라밸빌리지의 공공임대주택과 행복주택, 휴먼에너지타운의 AA33 공동주택(830세대) 및 B2 연립주택(316세대)까지 계획되어 있습니다.\n\n앞으로 상당한 인구 증가가 예상되는 만큼 행정서비스 이용객도 크게 증가할 것입니다.\n\n이에 따라 업무14부지 검단구청 신청사를 원안대로 조속히 확정하여 행정 중심 기능을 강화하여 주시기를 요청드립니다.\n\n또한 신청사 예정지는 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 검단구청역(가칭)을 중심으로 장기적인 환승체계를 검토하여 행정 접근성과 광역교통 기능을 동시에 확보할 필요가 있다고 생각합니다.\n\n아울러 인천2호선 고양연장 사업이 예비타당성조사를 통과하여 계획대로 추진될 수 있도록 적극 지원하여 주시기를 요청드립니다.\n\n특히 경찰서역(가칭)은 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 주요 공공기관 이용 편의를 높이는 핵심 거점이 될 수 있으므로 장기적으로 대장홍대선과의 환승체계도 함께 검토하여 주시기를 바랍니다.\n\n향후 대장홍대선 계양 연장을 검토하는 과정에서는 검단 연장 가능성도 함께 심도 있게 논의하여 검단구의 미래 교통수요를 충분히 반영해 주시기를 부탁드립니다.\n\n검단구의 미래를 위해 관계기관의 적극적인 협의와 추진을 요청드립니다."
+  },
+  {
+    "id": "12",
+    "label": "민원 12",
+    "title": "대규모 공동주택 개발에 맞춘 광역철도망 구축이 필요합니다.",
+    "content": "제목\n\n대규모 공동주택 개발에 맞춘 광역철도망 구축이 필요합니다.\n\n안녕하십니까.\n\n도시의 교통은 현재보다 미래를 기준으로 계획되어야 합니다.\n\n검단구에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대)를 비롯하여 워라밸빌리지와 휴먼에너지타운까지 지속적인 주거 개발이 이루어지고 있습니다.\n\n이와 같은 인구 증가를 고려하면 검단구청 신청사의 조기 확정과 광역철도망 구축은 더 이상 미룰 수 없는 과제라고 생각합니다.\n\n특히 업무14부지 신청사를 중심으로 검단구청역(가칭)을 검토하고, 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 환승체계를 함께 검토하여 검단구의 장기적인 교통 기반을 마련해 주시기를 요청드립니다.\n\n또한 인천2호선 고양연장 예비타당성조사의 통과와 함께 경찰서역(가칭)을 중심으로 한 대장홍대선 환승 가능성도 적극 검토하여 주시기 바랍니다."
+  },
+  {
+    "id": "13",
+    "label": "민원 13",
+    "title": "검단구청 신청사와 철도망은 함께 계획되어야 합니다.",
+    "content": "제목\n\n검단구청 신청사와 철도망은 함께 계획되어야 합니다.\n\n안녕하십니까.\n\n검단구청 신청사는 검단구를 대표하는 행정시설입니다.\n\n그러나 신청사만 건립하는 것이 아니라 장기적인 교통체계와 함께 계획해야 행정 접근성과 주민 편의성을 높일 수 있다고 생각합니다.\n\n이에 업무14부지 검단구청 신청사를 원안대로 조속히 확정하고, 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 환승체계를 검토하여 주시기를 요청드립니다.\n\n또한 인천2호선 고양연장 예비타당성조사가 성공적으로 추진될 수 있도록 지원하여 주시고, 경찰서역(가칭)과 대장홍대선의 연계 가능성도 함께 검토해 주시기를 바랍니다."
+  },
+  {
+    "id": "14",
+    "label": "민원 14",
+    "title": "워라밸빌리지의 미래 교통여건을 함께 검토해 주십시오.",
+    "content": "제목\n\n워라밸빌리지의 미래 교통여건을 함께 검토해 주십시오.\n\n안녕하십니까.\n\n워라밸빌리지는 더샵 검단레이크파크(2,857세대)를 중심으로 향후 공공임대주택과 행복주택이 계획되어 있는 새로운 주거권역입니다.\n\n앞으로 입주가 본격화되면 교통 수요도 크게 증가할 것으로 예상됩니다.\n\n따라서 인천2호선 고양연장 사업이 예비타당성조사를 통과하여 계획대로 추진될 수 있도록 적극 지원하여 주시기를 요청드립니다.\n\n또한 경찰서역(가칭)을 중심으로 대장홍대선 환승체계를 장기적으로 검토하여 워라밸빌리지 주민들의 광역교통 편의를 높여 주시기를 바랍니다.\n\n아울러 검단구청 신청사와 검단구청역(가칭)도 함께 추진하여 검단구 전체의 행정·교통 기능을 강화하여 주시기를 요청드립니다."
+  },
+  {
+    "id": "15",
+    "label": "민원 15",
+    "title": "휴먼에너지타운 개발과 연계한 광역교통망 구축을 요청드립니다.",
+    "content": "제목\n\n휴먼에너지타운 개발과 연계한 광역교통망 구축을 요청드립니다.\n\n안녕하십니까.\n\n휴먼에너지타운에는 AA33 공동주택(830세대)과 B2 연립주택(316세대)이 계획되어 있으며, 앞으로 새로운 생활권이 형성될 것으로 예상됩니다.\n\n이러한 변화에 대비하여 인천2호선 고양연장 사업의 예비타당성조사 통과를 적극 추진하여 주시기를 요청드립니다.\n\n또한 경찰서역(가칭)은 휴먼에너지타운과 검단경찰서, 소방서, 우체국, 검단구 임시청사 등을 연결하는 중요한 거점이 될 수 있으므로, 대장홍대선과의 환승체계도 함께 검토해 주시기를 바랍니다.\n\n더불어 대장홍대선 계양 연장 검토 시 검단 연장 가능성도 종합적으로 검토하여 미래 도시 성장에 대비한 철도망을 마련해 주시기를 요청드립니다."
+  },
+  {
+    "id": "16",
+    "label": "민원 16",
+    "title": "검단구 행정 중심지의 접근성 향상을 위한 철도망 검토를 요청드립니다.",
+    "content": "제목\n\n검단구 행정 중심지의 접근성 향상을 위한 철도망 검토를 요청드립니다.\n\n안녕하십니까.\n\n검단구는 새로운 자치구로 출범하면서 행정서비스의 중심이 될 검단구청 신청사 건립을 앞두고 있습니다. 신청사가 건립되면 주민들의 행정서비스 이용이 크게 증가할 것으로 예상되는 만큼, 교통 접근성도 함께 고려되어야 한다고 생각합니다.\n\n현재 신청사 예정지 생활권에는 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대)가 위치하고 있으며, 워라밸빌리지의 공공임대주택과 행복주택, 휴먼에너지타운의 AA33 공동주택(830세대) 및 B2 연립주택(316세대)까지 더해지면 행정서비스 수요는 더욱 증가할 것으로 예상됩니다.\n\n이에 업무14부지 검단구청 신청사를 원안대로 조속히 확정하여 주시기를 요청드립니다.\n\n또한 신청사와 연계하여 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연결하는 검단구청역(가칭)을 장기적인 도시계획 차원에서 검토하여 행정 접근성을 높여 주시기를 바랍니다.\n\n아울러 인천2호선 고양연장 사업이 예비타당성조사를 성공적으로 통과하여 계획대로 추진될 수 있도록 적극적인 관심과 지원을 부탁드리며, 대장홍대선 계양 연장 검토 과정에서는 검단 연장 가능성도 함께 심도 있게 논의하여 주시기를 요청드립니다."
+  },
+  {
+    "id": "17",
+    "label": "민원 17",
+    "title": "검단구 공공기관 접근성 향상을 위한 철도 연계 방안을 검토하여 주시기 바랍니다.",
+    "content": "제목\n\n검단구 공공기관 접근성 향상을 위한 철도 연계 방안을 검토하여 주시기 바랍니다.\n\n안녕하십니까.\n\n도시가 성장할수록 공공기관에 대한 접근성은 주민들의 생활 편의와 직결되는 중요한 요소입니다.\n\n현재 검단 남측에는 검단경찰서, 소방서, 우체국, 검단구 임시청사 등 다양한 공공기관이 위치하고 있으며, 앞으로 검단구 발전과 함께 이용객도 지속적으로 증가할 것으로 예상됩니다.\n\n이와 같은 여건을 고려하여 인천2호선 고양연장 사업은 반드시 예비타당성조사를 통과하여 정상적으로 추진될 수 있도록 적극 지원하여 주시기를 요청드립니다.\n\n또한 경찰서역(가칭)은 주요 공공기관을 연결하는 중심 거점이 될 수 있는 만큼, 향후 대장홍대선과 연계되는 환승체계를 함께 검토하여 보다 편리한 광역교통 환경을 마련하여 주시기를 바랍니다.\n\n아울러 업무14부지 검단구청 신청사를 원안대로 조속히 확정하고, 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 방안도 함께 검토하여 주시기를 요청드립니다."
+  },
+  {
+    "id": "18",
+    "label": "민원 18",
+    "title": "검단구의 지속가능한 발전을 위한 광역교통 기반 마련을 요청드립니다.",
+    "content": "제목\n\n검단구의 지속가능한 발전을 위한 광역교통 기반 마련을 요청드립니다.\n\n안녕하십니까.\n\n도시의 경쟁력은 주거 공급뿐만 아니라 교통 기반시설이 얼마나 적기에 구축되는지에 따라 크게 달라집니다.\n\n검단구는 지속적인 도시개발과 함께 인구가 꾸준히 증가하고 있으며, 신청사 예정지 생활권과 워라밸빌리지, 휴먼에너지타운 등 새로운 생활권도 함께 형성되고 있습니다.\n\n이러한 변화에 선제적으로 대응하기 위해서는 업무14부지 검단구청 신청사를 원안대로 추진하고, 신청사와 연계되는 검단구청역(가칭)에 대한 장기적인 검토가 필요하다고 생각합니다.\n\n또한 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 환승체계를 검토하여 검단구의 미래 교통 경쟁력을 확보하여 주시기를 바랍니다.\n\n아울러 인천2호선 고양연장 사업의 예비타당성조사 통과를 적극 지원하여 주시고, 대장홍대선 계양 연장 검토 시에는 검단 연장 가능성도 함께 심도 있게 논의하여 주시기를 요청드립니다."
+  },
+  {
+    "id": "19",
+    "label": "민원 19",
+    "title": "검단구의 장래 교통수요를 반영한 철도망 구축을 요청드립니다.",
+    "content": "제목\n\n검단구의 장래 교통수요를 반영한 철도망 구축을 요청드립니다.\n\n안녕하십니까.\n\n철도망은 현재의 인구만을 기준으로 계획하는 것이 아니라 앞으로의 도시 성장과 장래 교통수요를 함께 고려하여 구축되어야 한다고 생각합니다.\n\n검단구는 신청사 건립과 함께 대규모 공동주택 공급이 이어지고 있으며, 더샵 검단레이크파크(2,857세대), 검단신도시 푸르지오 더 파크(919세대), e편한세상 검단 에코비스타(732세대), 엘리프 검단 포레듀(669세대), 워라밸빌리지, 휴먼에너지타운 등 지속적인 개발이 예정되어 있습니다.\n\n이러한 변화에 맞추어 업무14부지 검단구청 신청사를 조속히 확정하고, 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 방안을 검토하여 주시기를 바랍니다.\n\n또한 인천2호선 고양연장 사업이 차질 없이 추진될 수 있도록 예비타당성조사 통과를 적극 지원하여 주시고, 경찰서역(가칭)과 대장홍대선의 환승 가능성도 함께 검토하여 미래 교통수요에 대응해 주시기를 요청드립니다."
+  },
+  {
+    "id": "20",
+    "label": "민원 20",
+    "title": "검단구의 미래 경쟁력 확보를 위한 종합적인 교통정책 추진을 요청드립니다.",
+    "content": "제목\n\n검단구의 미래 경쟁력 확보를 위한 종합적인 교통정책 추진을 요청드립니다.\n\n안녕하십니까.\n\n검단구는 이제 독립된 행정구역으로 새로운 도약을 시작하였습니다. 앞으로는 행정과 주거, 산업, 교통이 유기적으로 연계되는 도시계획이 필요하다고 생각합니다.\n\n현재 신청사 예정지 생활권과 워라밸빌리지, 휴먼에너지타운에서는 지속적인 개발이 이루어지고 있으며, 이에 따라 행정서비스와 광역교통에 대한 수요도 함께 증가할 것으로 예상됩니다.\n\n이에 업무14부지 검단구청 신청사를 원안대로 조속히 확정하여 주시고, 검단구청역(가칭)을 중심으로 인천1호선 연장(104역), 인천순환3호선, 대장홍대선을 연계하는 환승체계를 장기적인 관점에서 검토하여 주시기를 요청드립니다.\n\n또한 인천2호선 고양연장 사업은 반드시 예비타당성조사를 성공적으로 통과하여 계획대로 추진될 수 있도록 적극 지원하여 주시기를 바랍니다.\n\n아울러 경찰서역(가칭)과 대장홍대선의 환승체계, 그리고 향후 대장홍대선 계양 연장 검토 시 검단 연장 가능성도 함께 심도 있게 논의하여 검단구의 미래 성장과 도시 경쟁력을 높일 수 있는 광역교통 정책이 마련되기를 기대합니다.\n\n인천광역시, 검단구, 국토교통부, 철도 관계기관, 지역 정치권이 긴밀하게 협력하여 검단구의 지속가능한 발전을 위한 정책을 적극 검토하고 추진하여 주시기를 부탁드립니다."
+  }
+];
+
+    const listEl = document.getElementById('list');
+    const emptyEl = document.getElementById('emptyState');
+    const searchInput = document.getElementById('searchInput');
+    const toast = document.getElementById('toast');
+    const entryPopup = document.getElementById('entryPopup');
+    const enterSiteBtn = document.getElementById('enterSiteBtn');
+    const entryOptions = [...document.querySelectorAll('.entry-option')];
+    const pageContent = document.getElementById('pageContent');
+    const selectedBanner = document.getElementById('selectedBanner');
+    const selectedProfileText = document.getElementById('selectedProfileText');
+    const entryCountList = document.getElementById('entryCountList');
+    const clickCountList = document.getElementById('clickCountList');
+    const ENTRY_TYPES = [
+      { key: '검단신도시 푸르지오 더 파크', label: '검푸파', initial: 1396 },
+      { key: '이편한세상 검단 에코비스타', label: '이검에', initial: 857 },
+      { key: '더샵 검단레이크파크', label: '더레파', initial: 1249 },
+      { key: '엘리프 검단 포레듀', label: '엘검포', initial: 717 },
+      { key: '검단신도시 입주예정자 및 입주민', label: '신도시', initial: 679 },
+      { key: '원도심 입주민', label: '원도심', initial: 200 }
+    ];
+    const CLICK_TYPES = [
+      { key: 'total', label: '전체', initial: 5330 },
+      { key: 'dajang', label: '대장홍대', initial: 2822 },
+      { key: 'incheon3', label: '인천3호', initial: 1273 },
+      { key: 'incheon1', label: '인천1호', initial: 1235 }
+    ];
+    let selectedProfile = '';
+    const FIXED_ENTRY_COUNTS = Object.freeze(Object.fromEntries(ENTRY_TYPES.map(item => [item.key, item.initial])));
+    const FIXED_CLICK_COUNTS = Object.freeze(Object.fromEntries(CLICK_TYPES.map(item => [item.key, item.initial])));
+
+    function normalizeProfileKey(value) {
+      return String(value || '').replace(/\s+/g, ' ').trim();
+    }
+
+    function getEntryCounts() {
+      return FIXED_ENTRY_COUNTS;
+    }
+
+    function setEntryCounts() {
+      return FIXED_ENTRY_COUNTS;
+    }
+
+    function getClickCounts() {
+      return FIXED_CLICK_COUNTS;
+    }
+
+    function setClickCounts() {
+      return FIXED_CLICK_COUNTS;
+    }
+
+    function renderEntryCounts() {
+      const counts = getEntryCounts();
+      entryCountList.innerHTML = ENTRY_TYPES.map(item => `<span class="tracker-item">${item.label} <span class="count">${Number(counts[item.key] || 0).toLocaleString('ko-KR')}</span></span>`).join('');
+      const clickCounts = getClickCounts();
+      clickCountList.innerHTML = CLICK_TYPES.map((item, index) => {
+        const divider = index === 0 ? '' : `<span class="tracker-divider">|</span>`;
+        return `${divider}<span class="tracker-click-item">${item.label} <span class="count">${Number(clickCounts[item.key] || 0).toLocaleString('ko-KR')}</span></span>`;
+      }).join(' ');
+    }
+
+    function incrementClickCounters() {
+      return getClickCounts();
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add('show');
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(() => toast.classList.remove('show'), 1700);
+    }
+
+    async function copyText(text, label) {
+      try {
+        await navigator.clipboard.writeText(text);
+      } catch (e) {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        ta.remove();
+      }
+      showToast(label + ' 복사 완료');
+    }
+
+    document.addEventListener('click', (event) => {
+      const link = event.target.closest('a[href="https://www.epeople.go.kr"]');
+      if (link) incrementClickCounters();
+    });
+
+    function excerpt(text) {
+      return text.replace(/\n+/g, ' ').trim().slice(0, 135) + '…';
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    let currentQuery = '';
+
+    function escapeRegExp(text) {
+      return text.replace(/[.*+?^${}()|[\]\\]/g, '\$&');
+    }
+
+    function highlightText(text, query) {
+      const safe = escapeHtml(text);
+      if (!query) return safe;
+      const pattern = new RegExp(`(${escapeRegExp(escapeHtml(query))})`, 'gi');
+      return safe.replace(pattern, '<mark class="search-hit">$1</mark>');
+    }
+
+    function render(data) {
+      listEl.innerHTML = data.map((item, idx) => `
+        <article class="card" data-card>
+          <div class="card-head">
+            <div class="num">${item.label.includes('번호') ? '추가' : item.id}</div>
+            <div>
+              <div class="meta">${highlightText(item.label, currentQuery)}</div>
+              <h2 class="title">${highlightText(item.title, currentQuery)}</h2>
+            </div>
+          </div>
+          <div class="body">
+            <div class="excerpt">${highlightText(excerpt(item.content), currentQuery)}</div>
+            <div class="content" id="content-${idx}">${highlightText(item.content, currentQuery)}</div>
+            <div class="actions">
+              <button class="btn" onclick="copyContent(${idx})">민원 내용 복사</button>
+              <button class="btn sub" onclick="copyTitle(${idx})">제목 복사</button>
+              <button class="btn sub" onclick="toggleCard(${idx}, this)">펼쳐 보기</button>
+              <a class="link-btn sub" href="https://www.epeople.go.kr" target="_blank" rel="noopener">민원 접수하러 가기</a>
+            </div>
+            <div class="mini-note">개인 상황에 맞는 한두 문장을 보완하면 더 자연스럽게 활용할 수 있습니다.</div>
+          </div>
+        </article>
+      `).join('');
+      emptyEl.style.display = data.length ? 'none' : 'block';
+    }
+
+    function copyContent(index) {
+      const item = filtered[index];
+      copyText(item.content, item.label);
+    }
+
+    function copyTitle(index) {
+      const item = filtered[index];
+      copyText(item.title, item.label + ' 제목');
+    }
+
+    function toggleCard(index, button) {
+      const cards = [...document.querySelectorAll('[data-card]')];
+      const card = cards[index];
+      if (!card) return;
+      const opened = card.classList.toggle('open');
+      button.textContent = opened ? '접기' : '펼쳐 보기';
+    }
+
+    function expandAll() {
+      document.querySelectorAll('[data-card]').forEach(card => card.classList.add('open'));
+      document.querySelectorAll('[data-card] .actions button:nth-child(3)').forEach(btn => btn.textContent = '접기');
+    }
+
+    function collapseAll() {
+      document.querySelectorAll('[data-card]').forEach(card => card.classList.remove('open'));
+      document.querySelectorAll('[data-card] .actions button:nth-child(3)').forEach(btn => btn.textContent = '펼쳐 보기');
+    }
+
+    function copyAll() {
+      const text = petitions.map(item => `${item.label}\n${item.content}`).join('\n\n------------------------------\n\n');
+      copyText(text, '전체 민원');
+    }
+
+    let filtered = [...petitions];
+    let searchMarks = [];
+    let activeSearchMarkIndex = -1;
+
+    function updateSearchNavigator() {
+      searchMarks = [...document.querySelectorAll('mark.search-hit')];
+      const counter = document.getElementById('searchCounter');
+      const prevBtn = document.getElementById('searchPrevBtn');
+      const nextBtn = document.getElementById('searchNextBtn');
+      const total = searchMarks.length;
+      const current = total && activeSearchMarkIndex >= 0 && activeSearchMarkIndex < total ? activeSearchMarkIndex + 1 : 0;
+      if (counter) counter.textContent = `${current} / ${total}`;
+      if (prevBtn) prevBtn.disabled = total === 0;
+      if (nextBtn) nextBtn.disabled = total === 0;
+      document.querySelectorAll('mark.search-hit.current-hit').forEach(mark => mark.classList.remove('current-hit'));
+    }
+
+    function ensureCardOpenForMark(mark) {
+      const card = mark?.closest('[data-card]');
+      if (!card) return;
+      if (!card.classList.contains('open')) {
+        card.classList.add('open');
+        const toggleBtn = card.querySelector('.actions button:nth-child(3)');
+        if (toggleBtn) toggleBtn.textContent = '접기';
+      }
+    }
+
+    function activateSearchMark(index, options = {}) {
+      const shouldScroll = options.scroll !== false;
+      if (!searchMarks.length) {
+        activeSearchMarkIndex = -1;
+        updateSearchNavigator();
+        return;
+      }
+      if (index < 0) index = searchMarks.length - 1;
+      if (index >= searchMarks.length) index = 0;
+      activeSearchMarkIndex = index;
+      document.querySelectorAll('mark.search-hit.current-hit').forEach(mark => mark.classList.remove('current-hit'));
+      const target = searchMarks[activeSearchMarkIndex];
+      ensureCardOpenForMark(target);
+      target.classList.add('current-hit');
+      const counter = document.getElementById('searchCounter');
+      if (counter) counter.textContent = `${activeSearchMarkIndex + 1} / ${searchMarks.length}`;
+      if (shouldScroll) {
+        target.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+      }
+    }
+
+    function performSearch(options = {}) {
+      const raw = (searchInput?.value || '').trim();
+      const q = raw.toLowerCase();
+      currentQuery = raw;
+      if (!q) {
+        filtered = [...petitions];
+      } else {
+        filtered = petitions.filter(item => (`${item.label} ${item.title} ${item.content}`).toLowerCase().includes(q));
+      }
+      render(filtered);
+      activeSearchMarkIndex = -1;
+      updateSearchNavigator();
+      if (options.focusFirst && searchMarks.length) {
+        activateSearchMark(0, { scroll: true });
+      }
+    }
+
+    function performSearchAndFocusFirst() {
+      performSearch({ focusFirst: true });
+      if (!searchMarks.length && (searchInput?.value || '').trim()) {
+        showToast('검색 결과가 없습니다');
+      }
+    }
+
+    function goToSearchHit(step) {
+      if (!searchMarks.length) {
+        showToast('검색 결과가 없습니다');
+        return;
+      }
+      if (activeSearchMarkIndex === -1) {
+        activateSearchMark(step < 0 ? searchMarks.length - 1 : 0, { scroll: true });
+        return;
+      }
+      activateSearchMark(activeSearchMarkIndex + step, { scroll: true });
+    }
+
+    ['input', 'keyup', 'change', 'search'].forEach(eventName => {
+      searchInput?.addEventListener(eventName, () => performSearch());
+    });
+
+    searchInput?.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        performSearchAndFocusFirst();
+      }
+    });
+
+    render(filtered);
+    renderEntryCounts();
+    updateSearchNavigator();
+
+    function selectEntry(profile, button) {
+      entryOptions.forEach(btn => btn.classList.remove('selected'));
+      if (button) button.classList.add('selected');
+      selectedProfile = profile || '';
+      const isReady = !!selectedProfile;
+      enterSiteBtn.classList.toggle('ready', isReady);
+      enterSiteBtn.classList.toggle('is-disabled', !isReady);
+      enterSiteBtn.setAttribute('aria-disabled', isReady ? 'false' : 'true');
+      enterSiteBtn.textContent = isReady ? `${selectedProfile} 입장하기 →` : '입장하기 →';
+      if (selectedProfile) {
+        enterSiteBtn.setAttribute('aria-label', selectedProfile + '로 입장하기');
+      } else {
+        enterSiteBtn.removeAttribute('aria-label');
+      }
+    }
+
+    function handleEntryOptionClick(button) {
+      if (!button) return;
+      selectEntry(button.dataset.profile || '', button);
+    }
+
+    function handleEnterSite() {
+      if (!selectedProfile) {
+        const selectedButton = document.querySelector('.entry-option.selected');
+        if (selectedButton) {
+          selectedProfile = selectedButton.dataset.profile || '';
+        }
+      }
+      if (!selectedProfile) {
+        showToast('먼저 입장 대상을 선택해 주세요');
+        return false;
+      }
+      const profileKey = normalizeProfileKey(selectedProfile);
+      const matchedType = ENTRY_TYPES.find(item => normalizeProfileKey(item.key) === profileKey);
+      const targetKey = matchedType ? matchedType.key : selectedProfile;
+      renderEntryCounts();
+      document.body.classList.remove('gate-locked');
+      entryPopup.classList.add('hidden');
+      pageContent.classList.remove('locked');
+      selectedProfileText.textContent = selectedProfile;
+      selectedBanner.classList.remove('hidden');
+      enterSiteBtn.classList.remove('ready');
+      enterSiteBtn.classList.remove('is-disabled');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      showToast(selectedProfile + ' 입장 완료');
+      return false;
+    }
+
+    entryOptions.forEach(button => {
+      button.addEventListener('click', () => handleEntryOptionClick(button));
+      button.addEventListener('touchend', (event) => {
+        event.preventDefault();
+        handleEntryOptionClick(button);
+      }, { passive: false });
+      button.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          handleEntryOptionClick(button);
+        }
+      });
+    });
+
+    enterSiteBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      return handleEnterSite();
+    });
+    enterSiteBtn.addEventListener('touchend', (event) => {
+      event.preventDefault();
+      handleEnterSite();
+    }, { passive: false });
+
+    function reopenEntryPopup() {
+      document.body.classList.add('gate-locked');
+      entryPopup.classList.remove('hidden');
+      pageContent.classList.add('locked');
+      enterSiteBtn.classList.toggle('ready', !!selectedProfile);
+      enterSiteBtn.classList.toggle('is-disabled', !selectedProfile);
+      enterSiteBtn.setAttribute('aria-disabled', selectedProfile ? 'false' : 'true');
+    }
+
+    window.handleEntryOptionClick = handleEntryOptionClick;
+    window.handleEnterSite = handleEnterSite;
+    window.reopenEntryPopup = reopenEntryPopup;
+    window.performSearch = performSearch;
+    window.performSearchAndFocusFirst = performSearchAndFocusFirst;
+    window.goToSearchHit = goToSearchHit;
+
+  </script>
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+
+  <style>
+    .entry-option.selected {
+      border-color: #e4c989 !important;
+      color: #fff4d2 !important;
+      background: linear-gradient(180deg, #2e3736 0%, #3b4745 100%) !important;
+      box-shadow: 0 0 0 6px rgba(228, 201, 137, 0.18), 0 16px 28px rgba(4, 20, 18, 0.30), inset 0 1px 0 rgba(255,255,255,.08) !important;
+      transform: translateY(-3px) scale(1.045) !important;
+    }
+    .entry-option.selected::after {
+      content: "✓ 선택됨" !important;
+      background: rgba(228, 201, 137, 0.18) !important;
+      color: #fff4d2 !important;
+      opacity: 1 !important;
+      transform: translateY(0) !important;
+    }
+    .enter-btn.ready {
+      background: linear-gradient(180deg, #3b9386 0%, #31786f 100%) !important;
+      border-color: rgba(228, 201, 137, .55) !important;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 20px 30px rgba(8, 33, 30, .30), 0 0 0 6px rgba(228, 201, 137, .14) !important;
+      color: #fff1c7 !important;
+      cursor: pointer !important;
+      opacity: 1 !important;
+      filter: none !important;
+    }
+    .enter-btn.is-disabled {
+      opacity: .58 !important;
+      cursor: not-allowed !important;
+    }
+  </style>
+
+<script>
+(function() {
+  function ready(fn){
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn, {once:true});
+    else fn();
+  }
+  ready(function(){
+    const entryPopup = document.getElementById('entryPopup');
+    const pageContent = document.getElementById('pageContent');
+    const enterBtn = document.getElementById('enterSiteBtn');
+    const options = Array.from(document.querySelectorAll('.entry-option'));
+    const selectedBanner = document.getElementById('selectedBanner');
+    const selectedProfileText = document.getElementById('selectedProfileText');
+    let selectedProfile = '';
+
+    function syncEnterButton() {
+      const ready = !!selectedProfile;
+      if (!enterBtn) return;
+      enterBtn.classList.toggle('ready', ready);
+      enterBtn.classList.toggle('is-disabled', !ready);
+      enterBtn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+      enterBtn.textContent = ready ? '입장하기 →' : '입장하기 →';
+    }
+
+    function selectOption(button) {
+      if (!button) return;
+      options.forEach(btn => btn.classList.remove('selected'));
+      button.classList.add('selected');
+      selectedProfile = (button.dataset.profile || '').trim();
+      window.__geomdanSelectedProfile = selectedProfile;
+      syncEnterButton();
+    }
+
+    function incrementSelectedCount(profile) {
+      try {
+        if (typeof window.getEntryCounts === 'function' && typeof window.setEntryCounts === 'function' && typeof window.renderEntryCounts === 'function') {
+          const counts = { ...window.getEntryCounts() };
+          counts[profile] = (counts[profile] || 0) + 1;
+          window.setEntryCounts(counts);
+          window.renderEntryCounts();
+          return;
+        }
+      } catch (e) {}
+
+      const items = Array.from(document.querySelectorAll('#entryCountList .tracker-item'));
+      items.forEach(item => {
+        const text = item.textContent || '';
+        if (profile.includes('푸르지오') && text.includes('검푸파')) {
+          const countEl = item.querySelector('.count');
+          if (countEl) countEl.textContent = (Number((countEl.textContent || '0').replace(/,/g,'')) + 1).toLocaleString('ko-KR');
+        } else if (profile.includes('에코비스타') && text.includes('이검에')) {
+          const countEl = item.querySelector('.count');
+          if (countEl) countEl.textContent = (Number((countEl.textContent || '0').replace(/,/g,'')) + 1).toLocaleString('ko-KR');
+        } else if (profile.includes('레이크파크') && text.includes('더레파')) {
+          const countEl = item.querySelector('.count');
+          if (countEl) countEl.textContent = (Number((countEl.textContent || '0').replace(/,/g,'')) + 1).toLocaleString('ko-KR');
+        } else if (profile.includes('포레듀') && text.includes('엘검포')) {
+          const countEl = item.querySelector('.count');
+          if (countEl) countEl.textContent = (Number((countEl.textContent || '0').replace(/,/g,'')) + 1).toLocaleString('ko-KR');
+        } else if (profile.includes('입주예정자 및 입주민') && text.includes('신도시')) {
+          const countEl = item.querySelector('.count');
+          if (countEl) countEl.textContent = (Number((countEl.textContent || '0').replace(/,/g,'')) + 1).toLocaleString('ko-KR');
+        } else if (profile.includes('원도심') && text.includes('원도심')) {
+          const countEl = item.querySelector('.count');
+          if (countEl) countEl.textContent = (Number((countEl.textContent || '0').replace(/,/g,'')) + 1).toLocaleString('ko-KR');
+        }
+      });
+    }
+
+    function enterSite() {
+      if (!selectedProfile) {
+        const selectedBtn = document.querySelector('.entry-option.selected');
+        if (selectedBtn) selectedProfile = (selectedBtn.dataset.profile || '').trim();
+      }
+      if (!selectedProfile) {
+        if (typeof window.showToast === 'function') window.showToast('먼저 아파트 또는 유형을 선택해 주세요');
+        return false;
+      }
+      incrementSelectedCount(selectedProfile);
+      document.body.classList.remove('gate-locked');
+      if (entryPopup) entryPopup.classList.add('hidden');
+      if (pageContent) pageContent.classList.remove('locked');
+      if (selectedBanner) selectedBanner.classList.remove('hidden');
+      if (selectedProfileText) selectedProfileText.textContent = selectedProfile;
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch(e) {}
+      if (typeof window.showToast === 'function') window.showToast(selectedProfile + ' 입장 완료');
+      return false;
+    }
+
+    options.forEach(button => {
+      button.onclick = function(e){ if (e) e.preventDefault(); selectOption(button); return false; };
+      button.ontouchstart = function(e){ selectOption(button); };
+    });
+
+    if (enterBtn) {
+      enterBtn.onclick = function(e){ if (e) e.preventDefault(); return enterSite(); };
+      enterBtn.ontouchstart = function(e){ return enterSite(); };
+    }
+
+    window.handleEntryOptionClick = selectOption;
+    window.handleEnterSite = enterSite;
+    syncEnterButton();
+  });
+})();
+</script>
+
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/v4513226cdae34746b4dedf0b4dfa099e1781791509496" integrity="sha512-ZE9pZaUXND66v380QUtch/5sE9tPFh2zg45pR2PB0CVkCtOREv2AJKkSidISWkysEuQ0EH8faUU5du78bx87UQ==" data-cf-beacon='{"version":"2024.11.0","token":"4edd5f8ec12a48cfa682ab8261b80a79"}' crossorigin="anonymous"></script>
+</body>
+</html>
