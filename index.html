@@ -12663,5 +12663,118 @@ function renderGeneratedDraft(draft) {
 })();
 </script>
 
+
+<script id="persistent-counter-sync-verification">
+(function () {
+  'use strict';
+
+  const COMPLAINT_STORAGE_KEY = 'geomdanPetitionClickCountsPersistentV3';
+  const ENTRY_STORAGE_KEY = 'geomdanApartmentEntryCountsV1';
+
+  const complaintMap = {
+    total: 'totalComplaintCount',
+    incheon1: '인천 1호선',
+    incheon2: '인천2호선 고양 연장선',
+    incheon3: '인천순환3호선',
+    dajang: '대장홍대선',
+    office14: '검단구청 신청사 업무14 부지 확정',
+    all: '전체 종합 민원 접수'
+  };
+
+  function safeRead(key) {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || '{}');
+      return value && typeof value === 'object' ? value : {};
+    } catch (error) {
+      console.warn(key + ' 저장값을 읽지 못했습니다.', error);
+      return {};
+    }
+  }
+
+  function formatCount(value) {
+    const number = Number(value);
+    return (Number.isFinite(number) && number >= 0 ? Math.floor(number) : 0)
+      .toLocaleString('ko-KR');
+  }
+
+  function syncComplaintCounterDisplay() {
+    const counts = safeRead(COMPLAINT_STORAGE_KEY);
+
+    const total = document.getElementById('totalComplaintCount');
+    if (total) total.textContent = formatCount(counts.total);
+
+    const list = document.getElementById('clickCountList');
+    if (!list) return;
+
+    const keys = ['incheon1', 'incheon2', 'incheon3', 'dajang', 'office14', 'all'];
+    list.innerHTML = keys.map((key, index) => {
+      const divider = index === 0 ? '' : '<span class="tracker-divider">|</span>';
+      return divider +
+        '<span class="tracker-click-item">' +
+        complaintMap[key] +
+        ' <span class="count">' +
+        formatCount(counts[key]) +
+        '</span></span>';
+    }).join(' ');
+  }
+
+  function syncEntryCounterDisplay() {
+    if (typeof window.renderPersistentEntryCounts === 'function') {
+      window.renderPersistentEntryCounts();
+      return;
+    }
+
+    const list = document.getElementById('entryCountList');
+    if (!list) return;
+
+    const counts = safeRead(ENTRY_STORAGE_KEY);
+    const apartments = [
+      ['검단신도시 푸르지오 더 파크', '검푸파'],
+      ['이편한세상 검단 에코비스타', '이검에'],
+      ['더샵 검단레이크파크', '더레파'],
+      ['엘리프 검단 포레듀', '엘검포']
+    ];
+
+    list.innerHTML = apartments.map(([key, label]) =>
+      '<span class="tracker-item">' +
+      label +
+      ' <span class="count">' +
+      formatCount(counts[key]) +
+      '</span></span>'
+    ).join('');
+  }
+
+  function syncAllCounters() {
+    syncComplaintCounterDisplay();
+    syncEntryCounterDisplay();
+  }
+
+  window.addEventListener('storage', function (event) {
+    if (event.key === COMPLAINT_STORAGE_KEY || event.key === ENTRY_STORAGE_KEY) {
+      syncAllCounters();
+    }
+  });
+
+  window.addEventListener('pageshow', syncAllCounters);
+  document.addEventListener('visibilitychange', function () {
+    if (!document.hidden) syncAllCounters();
+  });
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', syncAllCounters, { once: true });
+  } else {
+    syncAllCounters();
+  }
+
+  window.geomdanCounterStatus = Object.freeze({
+    complaintStorageKey: COMPLAINT_STORAGE_KEY,
+    entryStorageKey: ENTRY_STORAGE_KEY,
+    persistence: 'localStorage',
+    scope: 'same browser and device',
+    crossTabSync: true
+  });
+})();
+</script>
+
 </body>
 </html>
