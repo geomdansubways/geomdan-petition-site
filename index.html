@@ -8571,6 +8571,44 @@ body,
 }
 </style>
 
+
+<style id="remove-period-outer-transparent-box">
+/* 민원 접수 기간 영역의 바깥 투명 박스 제거 */
+.pastel-period-bar,
+.petition-period-inner,
+.petition-period-bar,
+.live-datetime-bar + div {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+.pastel-period-bar {
+  padding: 0 !important;
+  border-radius: 0 !important;
+  overflow: visible !important;
+}
+
+/* 안쪽 두 개의 정보 박스 스타일은 그대로 유지 */
+.pastel-period-label,
+.pastel-period-date {
+  box-shadow: none !important;
+}
+</style>
+
+
+<style id="persistent-complaint-counter-visibility">
+.tracker-click-item .count,
+.tracker-title-total .count,
+#totalComplaintCount {
+  color: #16915E !important;
+  -webkit-text-fill-color: #16915E !important;
+  font-weight: 900 !important;
+}
+</style>
+
 </head>
 <body class="gate-locked">
 <div class="entry-overlay" id="entryPopup">
@@ -8860,7 +8898,7 @@ body,
       { key: 'office14', label: '검단구청 신청사 업무14 부지 확정', initial: 0 },
       { key: 'all', label: '전체 종합 민원 접수', initial: 0 }
     ];
-    const CLICK_COUNT_STORAGE_KEY = 'geomdanPetitionClickCountsResetZeroV2';
+    const CLICK_COUNT_STORAGE_KEY = 'geomdanPetitionClickCountsPersistentV3';
     let selectedProfile = '';
     const FIXED_ENTRY_COUNTS = Object.freeze(Object.fromEntries(ENTRY_TYPES.map(item => [item.key, item.initial])));
     const INITIAL_CLICK_COUNTS = Object.freeze(Object.fromEntries(CLICK_TYPES.map(item => [item.key, item.initial])));
@@ -8878,7 +8916,22 @@ body,
     }
 
     function getClickCounts() {
-      return { ...INITIAL_CLICK_COUNTS };
+      try {
+        const saved = JSON.parse(localStorage.getItem(CLICK_COUNT_STORAGE_KEY) || '{}');
+        const normalized = { ...INITIAL_CLICK_COUNTS };
+
+        CLICK_TYPES.forEach(item => {
+          const value = Number(saved?.[item.key]);
+          normalized[item.key] = Number.isFinite(value) && value >= 0
+            ? Math.floor(value)
+            : INITIAL_CLICK_COUNTS[item.key];
+        });
+
+        return normalized;
+      } catch (error) {
+        console.warn('저장된 민원 접수 건수를 불러오지 못했습니다.', error);
+        return { ...INITIAL_CLICK_COUNTS };
+      }
     }
 
     function setClickCounts(nextCounts) {
@@ -8969,13 +9022,21 @@ body,
 
     document.addEventListener('click', (event) => {
       const link = event.target.closest('a[href^="https://www.epeople.go.kr"]');
-      if (!link) return;
+      if (!link || link.dataset.countHandled === 'true') return;
 
       const topicKey = link.dataset.topic || currentTopic || '';
+      const isValidTopic = CLICK_TYPES.some(item => item.key === topicKey && item.key !== 'total');
+      if (!isValidTopic) return;
+
+      link.dataset.countHandled = 'true';
       incrementClickCounters(topicKey);
 
-      const label = TOPIC_LABELS[topicKey] || '전체';
-      showToast(`${label} 민원 접수 클릭이 카운트되었습니다`);
+      const label = TOPIC_LABELS[topicKey] || '선택한 항목';
+      showToast(`${label} 민원 접수 건수가 1건 추가되었습니다`);
+
+      window.setTimeout(() => {
+        delete link.dataset.countHandled;
+      }, 500);
     });
 
     function excerpt(text) {
@@ -12393,5 +12454,168 @@ function renderGeneratedDraft(draft) {
   document.documentElement.style.setProperty("--random-site-bg", `url('${url}')`);
 })();
 </script>
+
+<script id="persistent-entry-counter-patch">
+(function () {
+  'use strict';
+
+  const STORAGE_KEY = 'geomdanApartmentEntryCountsV1';
+  const APARTMENTS = [
+    { profile: '검단신도시 푸르지오 더 파크', label: '검푸파' },
+    { profile: '이편한세상 검단 에코비스타', label: '이검에' },
+    { profile: '더샵 검단레이크파크', label: '더레파' },
+    { profile: '엘리프 검단 포레듀', label: '엘검포' }
+  ];
+
+  function emptyCounts() {
+    return Object.fromEntries(APARTMENTS.map(item => [item.profile, 0]));
+  }
+
+  function loadCounts() {
+    const defaults = emptyCounts();
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
+      APARTMENTS.forEach(item => {
+        const value = Number(saved[item.profile]);
+        defaults[item.profile] = Number.isFinite(value) && value >= 0
+          ? Math.floor(value)
+          : 0;
+      });
+    } catch (error) {
+      console.warn('입장 카운트를 불러오지 못했습니다.', error);
+    }
+    return defaults;
+  }
+
+  function saveCounts(counts) {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(counts));
+    } catch (error) {
+      console.warn('입장 카운트를 저장하지 못했습니다.', error);
+    }
+  }
+
+  function renderCounts() {
+    const list = document.getElementById('entryCountList');
+    if (!list) return;
+    const counts = loadCounts();
+    list.innerHTML = APARTMENTS.map(item =>
+      '<span class="tracker-item">' +
+      item.label +
+      ' <span class="count">' +
+      Number(counts[item.profile] || 0).toLocaleString('ko-KR') +
+      '</span></span>'
+    ).join('');
+  }
+
+  function incrementCount(profile) {
+    const matched = APARTMENTS.find(item => item.profile === profile);
+    if (!matched) return;
+    const counts = loadCounts();
+    counts[matched.profile] = Number(counts[matched.profile] || 0) + 1;
+    saveCounts(counts);
+    renderCounts();
+  }
+
+  function initializePersistentEntryCounter() {
+    const popup = document.getElementById('entryPopup');
+    const pageContent = document.getElementById('pageContent');
+    const oldEnterButton = document.getElementById('enterSiteBtn');
+    const selectedBanner = document.getElementById('selectedBanner');
+    const selectedProfileText = document.getElementById('selectedProfileText');
+
+    if (!popup || !pageContent || !oldEnterButton) {
+      renderCounts();
+      return;
+    }
+
+    // 기존 중복 이벤트를 제거하기 위해 선택 버튼과 입장 버튼을 새 노드로 교체합니다.
+    const oldOptions = Array.from(document.querySelectorAll('.entry-option'));
+    const options = oldOptions.map(oldButton => {
+      const newButton = oldButton.cloneNode(true);
+      newButton.removeAttribute('onclick');
+      oldButton.replaceWith(newButton);
+      return newButton;
+    });
+
+    const enterButton = oldEnterButton.cloneNode(true);
+    enterButton.removeAttribute('onclick');
+    oldEnterButton.replaceWith(enterButton);
+
+    let selectedProfile = '';
+
+    function syncEnterButton() {
+      const ready = Boolean(selectedProfile);
+      enterButton.classList.toggle('ready', ready);
+      enterButton.classList.toggle('is-disabled', !ready);
+      enterButton.setAttribute('aria-disabled', ready ? 'false' : 'true');
+    }
+
+    function selectApartment(button) {
+      options.forEach(item => item.classList.remove('selected'));
+      button.classList.add('selected');
+      selectedProfile = (button.dataset.profile || '').trim();
+      syncEnterButton();
+    }
+
+    function enterSite(event) {
+      if (event) event.preventDefault();
+      if (!selectedProfile) {
+        if (typeof window.showToast === 'function') {
+          window.showToast('먼저 아파트를 선택해 주세요');
+        }
+        return false;
+      }
+
+      incrementCount(selectedProfile);
+
+      document.body.classList.remove('gate-locked');
+      popup.classList.add('hidden');
+      pageContent.classList.remove('locked');
+
+      if (selectedBanner) selectedBanner.classList.remove('hidden');
+      if (selectedProfileText) selectedProfileText.textContent = selectedProfile;
+
+      try {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      } catch (error) {
+        window.scrollTo(0, 0);
+      }
+
+      if (typeof window.showToast === 'function') {
+        window.showToast(selectedProfile + ' 입장 완료 · 방문자 수가 1 증가했습니다');
+      }
+      return false;
+    }
+
+    options.forEach(button => {
+      button.addEventListener('click', function (event) {
+        event.preventDefault();
+        selectApartment(button);
+      });
+    });
+
+    enterButton.addEventListener('click', enterSite);
+
+    // 다른 코드에서 다시 입장 화면을 열 때도 선택 기능이 유지되도록 연결합니다.
+    window.handleEntryOptionClick = function (button) {
+      if (button) selectApartment(button);
+      return false;
+    };
+    window.handleEnterSite = enterSite;
+    window.renderPersistentEntryCounts = renderCounts;
+
+    renderCounts();
+    syncEnterButton();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializePersistentEntryCounter, { once: true });
+  } else {
+    initializePersistentEntryCounter();
+  }
+})();
+</script>
+
 </body>
 </html>
