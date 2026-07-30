@@ -12776,5 +12776,351 @@ function renderGeneratedDraft(draft) {
 })();
 </script>
 
+
+<script type="module" id="firebase-shared-counter-patch">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.16.0/firebase-app.js";
+import {
+  getDatabase,
+  ref,
+  onValue,
+  runTransaction
+} from "https://www.gstatic.com/firebasejs/12.16.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAgX31CG9Lu_2afxwb13SixV3atRB-MZLI",
+  authDomain: "geomdansubway.firebaseapp.com",
+  databaseURL: "https://geomdansubway-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "geomdansubway",
+  storageBucket: "geomdansubway.firebasestorage.app",
+  messagingSenderId: "215970051445",
+  appId: "1:215970051445:web:6dffa55d4941f7e5e60f3c",
+  measurementId: "G-VC6C3L5FQX"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+const APARTMENTS = [
+  {
+    profile: "검단신도시 푸르지오 더 파크",
+    label: "검푸파",
+    path: "stats/visitors/geompa"
+  },
+  {
+    profile: "이편한세상 검단 에코비스타",
+    label: "이검에",
+    path: "stats/visitors/igeome"
+  },
+  {
+    profile: "더샵 검단레이크파크",
+    label: "더레파",
+    path: "stats/visitors/derepa"
+  },
+  {
+    profile: "엘리프 검단 포레듀",
+    label: "엘검포",
+    path: "stats/visitors/elgeompo"
+  }
+];
+
+const COMPLAINTS = [
+  { key: "incheon1", label: "인천 1호선" },
+  { key: "incheon2", label: "인천2호선 고양 연장선" },
+  { key: "incheon3", label: "인천순환3호선" },
+  { key: "dajang", label: "대장홍대선" },
+  { key: "office14", label: "검단구청 신청사 업무14 부지 확정" },
+  { key: "all", label: "전체 종합 민원 접수" }
+];
+
+const firebaseState = {
+  visitors: Object.fromEntries(APARTMENTS.map(item => [item.path, 0])),
+  complaints: Object.fromEntries(
+    ["total", ...COMPLAINTS.map(item => item.key)].map(key => [key, 0])
+  )
+};
+
+function safeNumber(value) {
+  const number = Number(value);
+  return Number.isFinite(number) && number >= 0 ? Math.floor(number) : 0;
+}
+
+function formatNumber(value) {
+  return safeNumber(value).toLocaleString("ko-KR");
+}
+
+function showCounterToast(message) {
+  if (typeof window.showToast === "function") {
+    window.showToast(message);
+    return;
+  }
+  const toast = document.getElementById("toast");
+  if (!toast) return;
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(window.__firebaseToastTimer);
+  window.__firebaseToastTimer = setTimeout(
+    () => toast.classList.remove("show"),
+    1800
+  );
+}
+
+function renderVisitorCounts() {
+  const list = document.getElementById("entryCountList");
+  if (!list) return;
+
+  list.innerHTML = APARTMENTS.map(item => (
+    '<span class="tracker-item">' +
+      item.label +
+      ' <span class="count">' +
+      formatNumber(firebaseState.visitors[item.path]) +
+      '</span>' +
+    '</span>'
+  )).join("");
+}
+
+function renderComplaintCounts() {
+  const total = document.getElementById("totalComplaintCount");
+  if (total) {
+    total.textContent = formatNumber(firebaseState.complaints.total);
+  }
+
+  const list = document.getElementById("clickCountList");
+  if (!list) return;
+
+  list.innerHTML = COMPLAINTS.map((item, index) => {
+    const divider = index === 0
+      ? ""
+      : '<span class="tracker-divider">|</span>';
+
+    return divider +
+      '<span class="tracker-click-item">' +
+        item.label +
+        ' <span class="count">' +
+        formatNumber(firebaseState.complaints[item.key]) +
+        '</span>' +
+      '</span>';
+  }).join(" ");
+}
+
+function subscribeToSharedCounters() {
+  APARTMENTS.forEach(item => {
+    onValue(
+      ref(database, item.path),
+      snapshot => {
+        firebaseState.visitors[item.path] = safeNumber(snapshot.val());
+        renderVisitorCounts();
+      },
+      error => {
+        console.error("방문자 수 실시간 읽기 실패:", item.path, error);
+      }
+    );
+  });
+
+  ["total", ...COMPLAINTS.map(item => item.key)].forEach(key => {
+    onValue(
+      ref(database, "stats/complaints/" + key),
+      snapshot => {
+        firebaseState.complaints[key] = safeNumber(snapshot.val());
+        renderComplaintCounts();
+      },
+      error => {
+        console.error("민원 수 실시간 읽기 실패:", key, error);
+      }
+    );
+  });
+}
+
+async function increaseSharedCount(path) {
+  await runTransaction(ref(database, path), currentValue => {
+    return safeNumber(currentValue) + 1;
+  });
+}
+
+async function countApartmentEntry(profile) {
+  const apartment = APARTMENTS.find(item => item.profile === profile);
+  if (!apartment) {
+    throw new Error("선택한 아파트를 찾지 못했습니다.");
+  }
+  await increaseSharedCount(apartment.path);
+}
+
+async function countComplaint(topicKey) {
+  const complaint = COMPLAINTS.find(item => item.key === topicKey);
+  if (!complaint) {
+    throw new Error("선택한 민원 항목을 찾지 못했습니다.");
+  }
+
+  await Promise.all([
+    increaseSharedCount("stats/complaints/" + topicKey),
+    increaseSharedCount("stats/complaints/total")
+  ]);
+}
+
+function replaceEntryControlsWithFirebaseVersion() {
+  const popup = document.getElementById("entryPopup");
+  const pageContent = document.getElementById("pageContent");
+  const oldEnterButton = document.getElementById("enterSiteBtn");
+  const selectedBanner = document.getElementById("selectedBanner");
+  const selectedProfileText = document.getElementById("selectedProfileText");
+
+  if (!popup || !pageContent || !oldEnterButton) return;
+
+  const oldOptions = Array.from(document.querySelectorAll(".entry-option"));
+  const options = oldOptions.map(oldButton => {
+    const newButton = oldButton.cloneNode(true);
+    newButton.removeAttribute("onclick");
+    oldButton.replaceWith(newButton);
+    return newButton;
+  });
+
+  const enterButton = oldEnterButton.cloneNode(true);
+  enterButton.removeAttribute("onclick");
+  oldEnterButton.replaceWith(enterButton);
+
+  let selectedProfile = "";
+  let isSubmitting = false;
+
+  function syncEnterButton() {
+    const ready = Boolean(selectedProfile) && !isSubmitting;
+    enterButton.classList.toggle("ready", ready);
+    enterButton.classList.toggle("is-disabled", !ready);
+    enterButton.setAttribute("aria-disabled", ready ? "false" : "true");
+    enterButton.disabled = !ready;
+    enterButton.textContent = isSubmitting ? "입장 기록 중..." : "입장하기 →";
+  }
+
+  function selectApartment(button) {
+    if (isSubmitting) return;
+    options.forEach(item => item.classList.remove("selected"));
+    button.classList.add("selected");
+    selectedProfile = String(button.dataset.profile || "").trim();
+    syncEnterButton();
+  }
+
+  async function enterSite(event) {
+    if (event) event.preventDefault();
+    if (!selectedProfile || isSubmitting) {
+      if (!selectedProfile) showCounterToast("먼저 아파트를 선택해 주세요");
+      return false;
+    }
+
+    isSubmitting = true;
+    syncEnterButton();
+
+    try {
+      await countApartmentEntry(selectedProfile);
+
+      document.body.classList.remove("gate-locked");
+      popup.classList.add("hidden");
+      pageContent.classList.remove("locked");
+
+      if (selectedBanner) selectedBanner.classList.remove("hidden");
+      if (selectedProfileText) {
+        selectedProfileText.textContent = selectedProfile;
+      }
+
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      showCounterToast(
+        selectedProfile + " 입장 완료 · 전체 방문자 수에 반영되었습니다"
+      );
+    } catch (error) {
+      console.error("Firebase 방문자 수 기록 실패:", error);
+      showCounterToast("방문자 수 기록에 실패했습니다. 잠시 후 다시 시도해 주세요");
+    } finally {
+      isSubmitting = false;
+      syncEnterButton();
+    }
+
+    return false;
+  }
+
+  options.forEach(button => {
+    button.addEventListener("click", event => {
+      event.preventDefault();
+      selectApartment(button);
+    });
+  });
+
+  enterButton.addEventListener("click", enterSite);
+
+  window.handleEntryOptionClick = button => {
+    if (button) selectApartment(button);
+    return false;
+  };
+  window.handleEnterSite = enterSite;
+
+  syncEnterButton();
+}
+
+function installComplaintLinkCounter() {
+  let inProgress = false;
+
+  document.addEventListener("click", async event => {
+    const link = event.target.closest(
+      'a[href^="https://www.epeople.go.kr"]'
+    );
+    if (!link || inProgress) return;
+
+    const topicKey = String(
+      link.dataset.topic || window.currentTopic || ""
+    ).trim();
+
+    if (!COMPLAINTS.some(item => item.key === topicKey)) return;
+
+    /*
+      기존 localStorage 클릭 핸들러가 같은 클릭을 다시 집계하지 못하도록
+      캡처 단계에서 전파를 중단합니다. 링크의 기본 이동 동작은 유지됩니다.
+    */
+    event.stopImmediatePropagation();
+
+    inProgress = true;
+    link.dataset.firebaseCounting = "true";
+
+    try {
+      await countComplaint(topicKey);
+      const label = COMPLAINTS.find(item => item.key === topicKey)?.label
+        || "선택한 항목";
+      showCounterToast(label + " 민원 접수 건수가 전체 집계에 반영되었습니다");
+    } catch (error) {
+      console.error("Firebase 민원 수 기록 실패:", error);
+      showCounterToast("민원 접수 건수 기록에 실패했습니다");
+    } finally {
+      inProgress = false;
+      delete link.dataset.firebaseCounting;
+    }
+  }, true);
+}
+
+function initializeFirebaseSharedCounters() {
+  renderVisitorCounts();
+  renderComplaintCounts();
+  subscribeToSharedCounters();
+  replaceEntryControlsWithFirebaseVersion();
+  installComplaintLinkCounter();
+
+  window.geomdanCounterStatus = Object.freeze({
+    persistence: "Firebase Realtime Database",
+    scope: "all connected phones and computers",
+    realtimeSync: true,
+    databaseURL: firebaseConfig.databaseURL
+  });
+
+  window.firebaseSharedCounter = Object.freeze({
+    countApartmentEntry,
+    countComplaint
+  });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener(
+    "DOMContentLoaded",
+    initializeFirebaseSharedCounters,
+    { once: true }
+  );
+} else {
+  initializeFirebaseSharedCounters();
+}
+</script>
+
 </body>
 </html>
